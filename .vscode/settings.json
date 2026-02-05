@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
+        "AHRS",
         "autocfg",
         "Biquad",
+        "Budden",
         "bytemuck",
         "libm"
     ]
