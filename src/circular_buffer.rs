@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+#[derive(Debug)]
 pub struct CircularBuffer<T, const N: usize> {
     /// The virtual beginning of the circular buffer.
     begin: usize,
@@ -11,18 +12,28 @@ pub struct CircularBuffer<T, const N: usize> {
     buffer: [T; N],
 }
 
+impl<T, const N: usize> Default for CircularBuffer<T, N>
+where
+    T: Copy,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T, const N: usize> CircularBuffer<T, N>
 where
     T: Copy,
 {
     pub fn new() -> Self {
         // SAFETY: Creating an uninitialized array is safe since we use MaybeUninit
-        let buffer = unsafe { core::mem::MaybeUninit::uninit().assume_init() };
+        // let buffer = unsafe { core::mem::MaybeUninit::uninit().assume_init() };
         Self {
             begin: 0,
             end: 0,
             size: 0,
-            buffer,
+            buffer: unsafe { core::mem::MaybeUninit::uninit().assume_init() }
+            //buffer,
         }
     }
     // need one spare empty cell so we can avoid end == begin when full

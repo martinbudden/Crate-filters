@@ -30,13 +30,15 @@ where
     pub fn new(k: f32) -> Self {
         Self {
             state: T::zero(),
-            k: k,
+            k,
         }
     }
+
     pub fn init(&mut self, k: f32) {
         self.k = k;
         self.reset();
     }
+
     pub fn reset(&mut self) {
         self.state = T::zero();
     }
@@ -54,10 +56,12 @@ where
     pub fn set_cutoff_frequency(&mut self, cutoff_frequency_hz: f32, delta_t: f32) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
     }
+
     pub fn set_cutoff_frequency_and_reset(&mut self, cutoff_frequency_hz: f32, delta_t: f32) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
         self.reset();
     }
+
     // Calculates filter gain based on delay (time constant of filter) - time it takes for filter response to reach 63.2% of a step input.
     pub fn gain_from_delay(delay: f32, delta_t: f32) -> f32 {
         if delay <= 0.0 {
@@ -67,10 +71,12 @@ where
         let omega = delta_t / delay;
         omega / (omega + 1.0)
     }
+
     pub fn gain_from_frequency(cutoff_frequency_hz: f32, delta_t: f32) -> f32 {
         let omega = 2.0 * consts::PI * cutoff_frequency_hz * delta_t;
         omega / (omega + 1.0)
     }
+
     // for testing
     fn state(self) -> T {
         self.state
@@ -101,20 +107,24 @@ where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<f32, Output = T>,
 {
     // PowerTransferFilter<n> cutoff correction = 1/sqrt(2^(1/n) - 1)
+    #[allow(clippy::excessive_precision)]
     const CUTOFF_CORRECTION: f32 = 1.553773974;
     pub fn new(k: f32) -> Self {
         Self {
             state: [T::zero(), T::zero()],
-            k: k,
+            k,
         }
     }
+
     pub fn init(&mut self, k: f32) {
         self.k = k;
         self.reset();
     }
+
     pub fn reset(&mut self) {
         self.state = [T::zero(), T::zero()];
     }
+
     pub fn set_to_passthrough(&mut self) {
         self.k = 1.0;
         self.reset();
@@ -129,6 +139,7 @@ where
     pub fn set_cutoff_frequency(&mut self, cutoff_frequency_hz: f32, delta_t: f32) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
     }
+
     pub fn set_cutoff_frequency_and_reset(&mut self, cutoff_frequency_hz: f32, delta_t: f32) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
         self.reset();
@@ -171,20 +182,24 @@ where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<f32, Output = T>,
 {
     // PowerTransferFilter<n> cutoff correction = 1/sqrt(2^(1/n) - 1)
+    #[allow(clippy::excessive_precision)]
     const CUTOFF_CORRECTION: f32 = 1.961459177;
     pub fn new(k: f32) -> Self {
         Self {
             state: [T::zero(), T::zero(), T::zero()],
-            k: k,
+            k,
         }
     }
+
     pub fn init(&mut self, k: f32) {
         self.k = k;
         self.reset();
     }
+
     pub fn reset(&mut self) {
         self.state = [T::zero(), T::zero(), T::zero()];
     }
+
     pub fn set_to_passthrough(&mut self) {
         self.k = 1.0;
         self.reset();
@@ -200,17 +215,21 @@ where
     pub fn set_cutoff_frequency(&mut self, cutoff_frequency_hz: f32, delta_t: f32) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
     }
+
     pub fn set_cutoff_frequency_and_reset(&mut self, cutoff_frequency_hz: f32, delta_t: f32) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
         self.reset();
     }
+
     pub fn gain_from_delay(delay: f32, delta_t: f32) -> f32 {
         FilterPT1::<T>::gain_from_delay(delay * Self::CUTOFF_CORRECTION, delta_t)
     }
+
     pub fn gain_from_frequency(cutoff_frequency_hz: f32, delta_t: f32) -> f32 {
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         FilterPT1::<T>::gain_from_frequency(cutoff_frequency_hz * Self::CUTOFF_CORRECTION, delta_t)
     }
+
     // for testing
     fn state(self) -> [T; 3] {
         self.state
@@ -356,6 +375,7 @@ where
         self.set_low_pass_frequency(frequency_hz);
         self.reset();
     }
+
     pub fn init_notch(&mut self, frequency_hz: f32, loop_time_seconds: f32, q: f32) {
         //assert(Q != 0.0 && "Q cannot be zero");
         self.set_loop_time(loop_time_seconds);
@@ -373,17 +393,17 @@ where
         self.weight = weight;
 
         let omega = frequency_hz * self._2_pi_loop_time_seconds;
-        let sin_cos = omega.sin_cos();
-        let alpha = sin_cos.0 * self._2_q_reciprocal;
+        let (sin_omega, cos_omega) = omega.sin_cos();
+        let alpha = sin_omega * self._2_q_reciprocal;
         let a0_reciprocal = 1.0 / (1.0 + alpha);
 
-        let cos_omega = sin_cos.1;
         self.b1 = (1.0 - cos_omega) * a0_reciprocal;
         self.b0 = self.b1 * 0.5;
         self.b2 = self.b0;
         self.a1 = -2.0 * cos_omega * a0_reciprocal;
         self.a2 = (1.0 - alpha) * a0_reciprocal;
     }
+
     pub fn set_low_pass_frequency(&mut self, frequency_hz: f32) {
         self.set_low_pass_frequency_weighted(frequency_hz, 1.0);
     }
@@ -405,15 +425,18 @@ where
         self.a1 = self.b1;
         self.a2 = (1.0 - alpha) * a0reciprocal;
     }
+
     pub fn set_notch_frequency_weighted_assuming_q(&mut self, frequency_hz: f32, weight: f32) {
         let omega = frequency_hz * self._2_pi_loop_time_seconds;
-        let sin_cos = omega.sin_cos();
-        self.set_notch_frequency_weighted_from_sin_cos_assuming_q(sin_cos.0, sin_cos.1, weight);
+        let (sin_omega, cos_omega) = omega.sin_cos();
+        self.set_notch_frequency_weighted_from_sin_cos_assuming_q(sin_omega, cos_omega, weight);
     }
+
     pub fn set_notch_frequency_assuming_q(&mut self, frequency_hz: f32) {
         // assumes Q already set
         self.set_notch_frequency_weighted_assuming_q(frequency_hz, 1.0);
     }
+
     pub fn set_notch_frequency(
         &mut self,
         center_frequency_hz: f32,
@@ -431,6 +454,7 @@ where
             / (center_frequency_hz * center_frequency_hz
                 - lower_cutoff_frequency_hz * lower_cutoff_frequency_hz)
     }
+
     pub fn set_q_from_frequencies(
         &mut self,
         center_frequency_hz: f32,
@@ -439,9 +463,11 @@ where
         self._2_q_reciprocal =
             1.0 / (2.0 * Self::calculate_q(center_frequency_hz, lower_cutoff_frequency_hz));
     }
+
     pub fn set_q(&mut self, q: f32) {
         self._2_q_reciprocal = 1.0 / (2.0 * q);
     }
+
     pub fn q_calculated(&self) -> f32 {
         (1.0 / self._2_q_reciprocal) / 2.0
     }
@@ -862,149 +888,147 @@ mod tests {
     }
     #[test]
     fn moving_average_filter_vector3d() {
-        {
-            let mut filter = FilterMovingAverage::<Vector3d, 4>::new();
-            let mut m = filter.filter(Vector3d {
+        let mut filter = FilterMovingAverage::<Vector3d, 4>::new();
+        let mut m = filter.filter(Vector3d {
+            x: 1.0,
+            y: 0.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
                 x: 1.0,
                 y: 0.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 1.0,
-                    y: 0.0,
-                    z: -3.0
-                },
-                m
-            );
+                z: -3.0
+            },
+            m
+        );
 
-            m = filter.filter(Vector3d {
+        m = filter.filter(Vector3d {
+            x: 2.0,
+            y: 0.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
+                x: 1.5,
+                y: 0.0,
+                z: -3.0
+            },
+            m
+        );
+
+        m = filter.filter(Vector3d {
+            x: 3.0,
+            y: 3.0,
+            z: 0.0,
+        });
+        assert_eq!(
+            Vector3d {
                 x: 2.0,
-                y: 0.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 1.5,
-                    y: 0.0,
-                    z: -3.0
-                },
-                m
-            );
+                y: 1.0,
+                z: -2.0
+            },
+            m
+        );
 
-            m = filter.filter(Vector3d {
-                x: 3.0,
-                y: 3.0,
-                z: 0.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 2.0,
-                    y: 1.0,
-                    z: -2.0
-                },
-                m
-            );
+        m = filter.filter(Vector3d {
+            x: 4.0,
+            y: 2.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
+                x: 2.5,
+                y: 1.25,
+                z: -2.25
+            },
+            m
+        );
 
-            m = filter.filter(Vector3d {
+        m = filter.filter(Vector3d {
+            x: 5.0,
+            y: 2.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
+                x: 3.5,
+                y: 1.75,
+                z: -2.25
+            },
+            m
+        );
+
+        m = filter.filter(Vector3d {
+            x: 6.0,
+            y: 2.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
+                x: 4.5,
+                y: 2.25,
+                z: -2.25
+            },
+            m
+        );
+
+        m = filter.filter(Vector3d {
+            x: 10.0,
+            y: 2.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
+                x: 6.25,
+                y: 2.0,
+                z: -3.0
+            },
+            m
+        );
+
+        filter.reset();
+        m = filter.filter(Vector3d {
+            x: 4.0,
+            y: 2.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
                 x: 4.0,
                 y: 2.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 2.5,
-                    y: 1.25,
-                    z: -2.25
-                },
-                m
-            );
+                z: -3.0
+            },
+            m
+        );
 
-            m = filter.filter(Vector3d {
+        m = filter.filter(Vector3d {
+            x: 20.0,
+            y: 0.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
+                x: 12.0,
+                y: 1.0,
+                z: -3.0
+            },
+            m
+        );
+
+        m = filter.filter(Vector3d {
+            x: -9.0,
+            y: 0.0,
+            z: -3.0,
+        });
+        assert_eq!(
+            Vector3d {
                 x: 5.0,
-                y: 2.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 3.5,
-                    y: 1.75,
-                    z: -2.25
-                },
-                m
-            );
-
-            m = filter.filter(Vector3d {
-                x: 6.0,
-                y: 2.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 4.5,
-                    y: 2.25,
-                    z: -2.25
-                },
-                m
-            );
-
-            m = filter.filter(Vector3d {
-                x: 10.0,
-                y: 2.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 6.25,
-                    y: 2.0,
-                    z: -3.0
-                },
-                m
-            );
-
-            filter.reset();
-            m = filter.filter(Vector3d {
-                x: 4.0,
-                y: 2.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 4.0,
-                    y: 2.0,
-                    z: -3.0
-                },
-                m
-            );
-
-            m = filter.filter(Vector3d {
-                x: 20.0,
-                y: 0.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 12.0,
-                    y: 1.0,
-                    z: -3.0
-                },
-                m
-            );
-
-            m = filter.filter(Vector3d {
-                x: -9.0,
-                y: 0.0,
-                z: -3.0,
-            });
-            assert_eq!(
-                Vector3d {
-                    x: 5.0,
-                    y: 2.0 / 3.0,
-                    z: -3.0
-                },
-                m
-            );
-        }
+                y: 2.0 / 3.0,
+                z: -3.0
+            },
+            m
+        );
     }
     #[test]
     fn filter_pt1_vector3d_i16() {

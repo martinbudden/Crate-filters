@@ -5,6 +5,7 @@
         "Biquad",
         "Budden",
         "bytemuck",
-        "libm"
+        "libm",
+        "Uninit"
     ]
 }
