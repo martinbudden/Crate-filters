@@ -35,7 +35,7 @@ where
             end: 0,
             size: 0,
             //buffer: unsafe { core::mem::MaybeUninit::uninit().assume_init() }
-            buffer: [T::zero();N],
+            buffer: [T::zero(); N],
         }
     }
     // need one spare empty cell so we can avoid end == begin when full

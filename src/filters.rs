@@ -533,9 +533,9 @@ where
 #[cfg(any(debug_assertions, test))]
 mod tests {
     use super::*;
-    use vector_quaternion_matrix::Vector3d;
-    use vector_quaternion_matrix::Vector3dI16;
-    use vector_quaternion_matrix::Vector3dI32;
+    use vector_quaternion_matrix::Vector3df32;
+    use vector_quaternion_matrix::Vector3di16;
+    use vector_quaternion_matrix::Vector3di32;
 
     #[test]
     fn filter_pt1_f32() {
@@ -672,19 +672,19 @@ mod tests {
         assert_eq!(5.0, filter.filter(-9.0));
     }
     #[test]
-    fn filter_pt1_vector3d() {
-        let mut filter = FilterPT1::<Vector3d>::new(1.0);
-        let mut output: Vector3d;
-        let mut state: Vector3d;
+    fn filter_pt1_vector3df32() {
+        let mut filter = FilterPT1::<Vector3df32>::new(1.0);
+        let mut output: Vector3df32;
+        let mut state: Vector3df32;
 
         // test that filter with default settings performs no filtering
-        output = filter.filter(Vector3d {
+        output = filter.filter(Vector3df32 {
             x: 2.0,
             y: 3.0,
             z: 5.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 2.0,
                 y: 3.0,
                 z: 5.0
@@ -693,7 +693,7 @@ mod tests {
         );
         state = filter.state();
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 2.0,
                 y: 3.0,
                 z: 5.0
@@ -704,7 +704,7 @@ mod tests {
         filter.reset();
         state = filter.state();
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 0.0,
                 y: 0.0,
                 z: 0.0
@@ -716,7 +716,7 @@ mod tests {
         assert_eq!(
             0.38586956,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 1.0,
                     y: 0.0,
                     z: 0.0
@@ -726,7 +726,7 @@ mod tests {
         assert_eq!(
             1.0087134,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 2.0,
                     y: 0.0,
                     z: 0.0
@@ -738,7 +738,7 @@ mod tests {
         assert_eq!(
             1.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 1.0,
                     y: 0.0,
                     z: 0.0
@@ -748,7 +748,7 @@ mod tests {
         assert_eq!(
             2.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 2.0,
                     y: 0.0,
                     z: 0.0
@@ -760,7 +760,7 @@ mod tests {
         assert_eq!(
             0.38586956,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 1.0,
                     y: 0.0,
                     z: 0.0
@@ -770,7 +770,7 @@ mod tests {
         assert_eq!(
             1.0087134,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 2.0,
                     y: 0.0,
                     z: 0.0
@@ -782,7 +782,7 @@ mod tests {
         assert_eq!(
             1.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 1.0,
                     y: 0.0,
                     z: 0.0
@@ -792,7 +792,7 @@ mod tests {
         assert_eq!(
             2.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 2.0,
                     y: 0.0,
                     z: 0.0
@@ -801,19 +801,19 @@ mod tests {
         );
     }
     #[test]
-    fn biquad_filter_vector3d() {
-        let mut filter = BiquadFilter::<Vector3d>::default();
-        let mut output: Vector3d;
-        let mut state: BiquadFilterState<Vector3d>;
+    fn biquad_filter_vector3df32() {
+        let mut filter = BiquadFilter::<Vector3df32>::default();
+        let mut output: Vector3df32;
+        let mut state: BiquadFilterState<Vector3df32>;
 
         // test that filter with default settings performs no filtering
-        output = filter.filter(Vector3d {
+        output = filter.filter(Vector3df32 {
             x: 2.0,
             y: 3.0,
             z: 5.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 2.0,
                 y: 3.0,
                 z: 5.0
@@ -835,7 +835,7 @@ mod tests {
         assert_eq!(
             4.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 4.0,
                     y: 0.0,
                     z: 0.0
@@ -848,7 +848,7 @@ mod tests {
         assert_eq!(
             1.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 1.0,
                     y: 0.0,
                     z: 0.0
@@ -858,7 +858,7 @@ mod tests {
         assert_eq!(
             2.0,
             filter
-                .filter(Vector3d {
+                .filter(Vector3df32 {
                     x: 2.0,
                     y: 0.0,
                     z: 0.0
@@ -868,7 +868,7 @@ mod tests {
         assert_eq!(
             1.0,
             filter
-                .filter_weighted(Vector3d {
+                .filter_weighted(Vector3df32 {
                     x: 1.0,
                     y: 0.0,
                     z: 0.0
@@ -878,7 +878,7 @@ mod tests {
         assert_eq!(
             2.0,
             filter
-                .filter_weighted(Vector3d {
+                .filter_weighted(Vector3df32 {
                     x: 2.0,
                     y: 0.0,
                     z: 0.0
@@ -887,15 +887,15 @@ mod tests {
         );
     }
     #[test]
-    fn moving_average_filter_vector3d() {
-        let mut filter = FilterMovingAverage::<Vector3d, 4>::new();
-        let mut m = filter.filter(Vector3d {
+    fn moving_average_filter_vector3df32() {
+        let mut filter = FilterMovingAverage::<Vector3df32, 4>::new();
+        let mut m = filter.filter(Vector3df32 {
             x: 1.0,
             y: 0.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 1.0,
                 y: 0.0,
                 z: -3.0
@@ -903,13 +903,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 2.0,
             y: 0.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 1.5,
                 y: 0.0,
                 z: -3.0
@@ -917,13 +917,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 3.0,
             y: 3.0,
             z: 0.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 2.0,
                 y: 1.0,
                 z: -2.0
@@ -931,13 +931,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 4.0,
             y: 2.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 2.5,
                 y: 1.25,
                 z: -2.25
@@ -945,13 +945,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 5.0,
             y: 2.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 3.5,
                 y: 1.75,
                 z: -2.25
@@ -959,13 +959,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 6.0,
             y: 2.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 4.5,
                 y: 2.25,
                 z: -2.25
@@ -973,13 +973,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 10.0,
             y: 2.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 6.25,
                 y: 2.0,
                 z: -3.0
@@ -988,13 +988,13 @@ mod tests {
         );
 
         filter.reset();
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 4.0,
             y: 2.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 4.0,
                 y: 2.0,
                 z: -3.0
@@ -1002,13 +1002,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: 20.0,
             y: 0.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 12.0,
                 y: 1.0,
                 z: -3.0
@@ -1016,13 +1016,13 @@ mod tests {
             m
         );
 
-        m = filter.filter(Vector3d {
+        m = filter.filter(Vector3df32 {
             x: -9.0,
             y: 0.0,
             z: -3.0,
         });
         assert_eq!(
-            Vector3d {
+            Vector3df32 {
                 x: 5.0,
                 y: 2.0 / 3.0,
                 z: -3.0
@@ -1031,44 +1031,44 @@ mod tests {
         );
     }
     #[test]
-    fn filter_pt1_vector3d_i16() {
-        let mut filter = FilterPT1::<Vector3dI16>::new(1.0);
-        let mut output: Vector3dI16;
-        let mut state: Vector3dI16;
+    fn filter_pt1_vector3df32_i16() {
+        let mut filter = FilterPT1::<Vector3di16>::new(1.0);
+        let mut output: Vector3di16;
+        let mut state: Vector3di16;
 
         // test that filter with default settings performs no filtering
-        output = filter.filter(Vector3dI16 { x: 2, y: 3, z: 5 });
-        assert_eq!(Vector3dI16 { x: 2, y: 3, z: 5 }, output);
+        output = filter.filter(Vector3di16 { x: 2, y: 3, z: 5 });
+        assert_eq!(Vector3di16 { x: 2, y: 3, z: 5 }, output);
         state = filter.state();
-        assert_eq!(Vector3dI16 { x: 2, y: 3, z: 5 }, state);
+        assert_eq!(Vector3di16 { x: 2, y: 3, z: 5 }, state);
     }
     #[test]
-    fn moving_average_filter_vector3d_i16() {
-        let mut filter = FilterMovingAverage::<Vector3dI16, 4>::new();
-        let mut m = filter.filter(Vector3dI16 { x: 4, y: 0, z: -12 });
-        assert_eq!(Vector3dI16 { x: 4, y: 0, z: -12 }, m);
+    fn moving_average_filter_vector3df32_i16() {
+        let mut filter = FilterMovingAverage::<Vector3di16, 4>::new();
+        let mut m = filter.filter(Vector3di16 { x: 4, y: 0, z: -12 });
+        assert_eq!(Vector3di16 { x: 4, y: 0, z: -12 }, m);
 
-        m = filter.filter(Vector3dI16 { x: 8, y: 0, z: -12 });
-        assert_eq!(Vector3dI16 { x: 6, y: 0, z: -12 }, m);
+        m = filter.filter(Vector3di16 { x: 8, y: 0, z: -12 });
+        assert_eq!(Vector3di16 { x: 6, y: 0, z: -12 }, m);
 
-        m = filter.filter(Vector3dI16 { x: 12, y: 12, z: 0 });
-        assert_eq!(Vector3dI16 { x: 8, y: 4, z: -8 }, m);
+        m = filter.filter(Vector3di16 { x: 12, y: 12, z: 0 });
+        assert_eq!(Vector3di16 { x: 8, y: 4, z: -8 }, m);
 
-        m = filter.filter(Vector3dI16 {
+        m = filter.filter(Vector3di16 {
             x: 16,
             y: 8,
             z: -12,
         });
-        assert_eq!(Vector3dI16 { x: 10, y: 5, z: -9 }, m);
+        assert_eq!(Vector3di16 { x: 10, y: 5, z: -9 }, m);
     }
     #[test]
-    fn filter_pt1_vector3d_i32() {
-        let mut filter = FilterPT1::<Vector3dI32>::new(1.0);
-        let mut output: Vector3dI32;
-        let mut state: Vector3dI32;
+    fn filter_pt1_vector3df32_i32() {
+        let mut filter = FilterPT1::<Vector3di32>::new(1.0);
+        let mut output: Vector3di32;
+        let mut state: Vector3di32;
 
         // test that filter with default settings performs no filtering
-        output = filter.filter(Vector3dI32 { x: 2, y: 3, z: 5 });
+        output = filter.filter(Vector3di32 { x: 2, y: 3, z: 5 });
         assert_eq!(2, output.x);
         assert_eq!(3, output.y);
         assert_eq!(5, output.z);
@@ -1078,22 +1078,22 @@ mod tests {
         assert_eq!(5, state.z);
     }
     #[test]
-    fn moving_average_filter_vector3d_i32() {
-        let mut filter = FilterMovingAverage::<Vector3dI32, 4>::new();
-        let mut m = filter.filter(Vector3dI32 { x: 4, y: 0, z: -12 });
-        assert_eq!(Vector3dI32 { x: 4, y: 0, z: -12 }, m);
+    fn moving_average_filter_vector3df32_i32() {
+        let mut filter = FilterMovingAverage::<Vector3di32, 4>::new();
+        let mut m = filter.filter(Vector3di32 { x: 4, y: 0, z: -12 });
+        assert_eq!(Vector3di32 { x: 4, y: 0, z: -12 }, m);
 
-        m = filter.filter(Vector3dI32 { x: 8, y: 0, z: -12 });
-        assert_eq!(Vector3dI32 { x: 6, y: 0, z: -12 }, m);
+        m = filter.filter(Vector3di32 { x: 8, y: 0, z: -12 });
+        assert_eq!(Vector3di32 { x: 6, y: 0, z: -12 }, m);
 
-        m = filter.filter(Vector3dI32 { x: 12, y: 12, z: 0 });
-        assert_eq!(Vector3dI32 { x: 8, y: 4, z: -8 }, m);
+        m = filter.filter(Vector3di32 { x: 12, y: 12, z: 0 });
+        assert_eq!(Vector3di32 { x: 8, y: 4, z: -8 }, m);
 
-        m = filter.filter(Vector3dI32 {
+        m = filter.filter(Vector3di32 {
             x: 16,
             y: 8,
             z: -12,
         });
-        assert_eq!(Vector3dI32 { x: 10, y: 5, z: -9 }, m);
+        assert_eq!(Vector3di32 { x: 10, y: 5, z: -9 }, m);
     }
 }
