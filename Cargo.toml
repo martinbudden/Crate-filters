@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 num-traits = "0.2.19"
-vector_quaternion_matrix = { git = "https://github.com/martinbudden/Crate-vector_quaternion_matrix" }
+vector-quaternion-matrix = { git = "https://github.com/martinbudden/Crate-vector_quaternion_matrix" }
 
 [dev-dependencies]
 # assert_float_eq = "1.2.0" # used for test

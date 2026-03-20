@@ -33,7 +33,7 @@ name = "filters"
 version = "0.1.0"
 dependencies = [
  "num-traits",
- "vector_quaternion_matrix",
+ "vector-quaternion-matrix",
 ]
 
 [[package]]
@@ -87,9 +87,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
-name = "vector_quaternion_matrix"
+name = "vector-quaternion-matrix"
 version = "0.1.0"
-source = "git+https://github.com/martinbudden/Crate-vector_quaternion_matrix#af7b85be8b03922aa7031e71f16e53abfc2c7ab1"
+source = "git+https://github.com/martinbudden/Crate-vector_quaternion_matrix#a6064a87bbe6e86e109726b129b5c022679dcc27"
 dependencies = [
  "bytemuck",
  "libm",
