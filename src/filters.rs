@@ -11,7 +11,7 @@ pub type Pt3Filterf64<T> = Pt3Filter<T, f64>;
 pub type BiquadFilterf32<T> = BiquadFilter<T, f32>;
 pub type BiquadFilterf64<T> = BiquadFilter<T, f64>;
 
-pub trait FIlterSignal<T, F> {
+pub trait FilterSignal<T, F> {
     fn apply(&mut self, input: T) -> T;
     fn reset(&mut self);
 }
@@ -43,7 +43,7 @@ where
     }
 }
 
-impl<T, F> FIlterSignal<T, F> for Pt1Filter<T, F>
+impl<T, F> FilterSignal<T, F> for Pt1Filter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
     F: Copy,
@@ -135,7 +135,7 @@ where
     }
 }
 
-impl<T, F> FIlterSignal<T, F> for Pt2Filter<T, F>
+impl<T, F> FilterSignal<T, F> for Pt2Filter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
     F: Copy,
@@ -216,7 +216,7 @@ where
     }
 }
 
-impl<T, F> FIlterSignal<T, F> for Pt3Filter<T, F>
+impl<T, F> FilterSignal<T, F> for Pt3Filter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
     F: Copy + Zero,
@@ -337,7 +337,7 @@ where
     }
 }
 
-impl<T, F> FIlterSignal<T, F> for BiquadFilter<T, F>
+impl<T, F> FilterSignal<T, F> for BiquadFilter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
     F: Copy + Zero + One + Div<F, Output = F>,
@@ -529,14 +529,14 @@ where
 /// See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FilterMovingAverage<T, const N: usize> {
+pub struct MovingAverageFilter<T, const N: usize> {
     count: usize,
     index: usize,
     sum: T,
     samples: [T; N],
 }
 
-impl<T, const N: usize> Default for FilterMovingAverage<T, N>
+impl<T, const N: usize> Default for MovingAverageFilter<T, N>
 where
     T: Copy + Zero,
 {
@@ -545,7 +545,7 @@ where
     }
 }
 
-impl<T, const N: usize> FilterMovingAverage<T, N>
+impl<T, const N: usize> MovingAverageFilter<T, N>
 where
     T: Copy + Zero,
 {
@@ -554,7 +554,7 @@ where
     }
 }
 
-impl<T, const N: usize> FilterMovingAverage<T, N>
+impl<T, const N: usize> MovingAverageFilter<T, N>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<f32, Output = T>,
 {
@@ -605,7 +605,7 @@ mod tests {
         is_full::<BiquadFilter<f32, f32>>();
         is_full::<BiquadFilterf32<f32>>();
         is_full::<BiquadFilterState<f32>>();
-        is_full::<FilterMovingAverage<f32, 2>>();
+        is_full::<MovingAverageFilter<f32, 2>>();
     }
     #[test]
     fn pt1_filter_f32() {
@@ -727,7 +727,7 @@ mod tests {
     }
     #[test]
     fn moving_average_filter_f32() {
-        let mut filter = FilterMovingAverage::<f32, 3>::new();
+        let mut filter = MovingAverageFilter::<f32, 3>::new();
         assert_eq!(1.0, filter.apply(1.0));
         assert_eq!(1.5, filter.apply(2.0));
         assert_eq!(2.0, filter.apply(3.0));
@@ -805,7 +805,7 @@ mod tests {
     }
     #[test]
     fn moving_average_filter_vector3df32() {
-        let mut filter = FilterMovingAverage::<Vector3df32, 4>::new();
+        let mut filter = MovingAverageFilter::<Vector3df32, 4>::new();
         let mut m = filter.apply(Vector3df32 { x: 1.0, y: 0.0, z: -3.0 });
         assert_eq!(Vector3df32 { x: 1.0, y: 0.0, z: -3.0 }, m);
 
@@ -851,7 +851,7 @@ mod tests {
     }
     #[test]
     fn moving_average_filter_vector3df32_i16() {
-        let mut filter = FilterMovingAverage::<Vector3di16, 4>::new();
+        let mut filter = MovingAverageFilter::<Vector3di16, 4>::new();
         let mut m = filter.apply(Vector3di16 { x: 4, y: 0, z: -12 });
         assert_eq!(Vector3di16 { x: 4, y: 0, z: -12 }, m);
 
@@ -882,7 +882,7 @@ mod tests {
     }
     #[test]
     fn moving_average_filter_vector3df32_i32() {
-        let mut filter = FilterMovingAverage::<Vector3di32, 4>::new();
+        let mut filter = MovingAverageFilter::<Vector3di32, 4>::new();
         let mut m = filter.apply(Vector3di32 { x: 4, y: 0, z: -12 });
         assert_eq!(Vector3di32 { x: 4, y: 0, z: -12 }, m);
 
