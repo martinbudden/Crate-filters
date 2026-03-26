@@ -61,7 +61,7 @@ where
 impl<T, F> Pt1Filter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
-    F: Copy + Zero + One + MathConstants + PartialOrd + Div<F, Output = F>,
+    F: Copy + Zero + One,
 {
     pub fn set_to_passthrough(&mut self) {
         self.k = F::one();
@@ -73,6 +73,18 @@ where
         self.reset();
     }
 
+    // for testing
+    #[allow(dead_code)]
+    fn state(self) -> T {
+        self.state
+    }
+}
+
+impl<T, F> Pt1Filter<T, F>
+where
+    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
+    F: Copy + Zero + One + MathConstants + PartialOrd + Div<F, Output = F>,
+{
     pub fn set_cutoff_frequency(&mut self, cutoff_frequency_hz: F, delta_t: F) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
     }
@@ -99,12 +111,6 @@ where
     pub fn gain_from_frequency2(cutoff_frequency_hz: F, delta_t: F) -> F {
         let omega = (F::one() + F::one()) * F::one() * cutoff_frequency_hz * delta_t;
         omega / (omega + F::one())
-    }
-
-    // for testing
-    #[allow(dead_code)]
-    fn state(self) -> T {
-        self.state
     }
 }
 
@@ -154,7 +160,7 @@ where
 impl<T, F> Pt2Filter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
-    F: Copy + Zero + One + MathConstants + PartialOrd + Div<F, Output = F>,
+    F: Copy + Zero + One,
 {
     pub fn set_to_passthrough(&mut self) {
         self.k = F::one();
@@ -166,6 +172,18 @@ where
         self.reset();
     }
 
+    // for testing
+    #[allow(dead_code)]
+    fn state(self) -> [T; 2] {
+        self.state
+    }
+}
+
+impl<T, F> Pt2Filter<T, F>
+where
+    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
+    F: Copy + Zero + One + MathConstants + PartialOrd + Div<F, Output = F>,
+{
     pub fn set_cutoff_frequency(&mut self, cutoff_frequency_hz: F, delta_t: F) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
     }
@@ -181,11 +199,6 @@ where
     pub fn gain_from_frequency(cutoff_frequency_hz: F, delta_t: F) -> F {
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         Pt1Filter::<T, F>::gain_from_frequency(cutoff_frequency_hz * F::FILTER_PT2_CUTOFF_CORRECTION, delta_t)
-    }
-    // for testing
-    #[allow(dead_code)]
-    fn state(self) -> [T; 2] {
-        self.state
     }
 }
 
@@ -236,7 +249,7 @@ where
 impl<T, F> Pt3Filter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
-    F: Copy + Zero + One + MathConstants + PartialOrd + Div<F, Output = F>,
+    F: Copy + Zero + One,
 {
     pub fn set_to_passthrough(&mut self) {
         self.k = F::one();
@@ -248,6 +261,18 @@ where
         self.reset();
     }
 
+    // for testing
+    #[allow(dead_code)]
+    fn state(self) -> [T; 3] {
+        self.state
+    }
+}
+
+impl<T, F> Pt3Filter<T, F>
+where
+    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
+    F: Copy + Zero + One + MathConstants + PartialOrd + Div<F, Output = F>,
+{
     pub fn set_cutoff_frequency(&mut self, cutoff_frequency_hz: F, delta_t: F) {
         self.k = Self::gain_from_frequency(cutoff_frequency_hz, delta_t);
     }
@@ -264,12 +289,6 @@ where
     pub fn gain_from_frequency(cutoff_frequency_hz: F, delta_t: F) -> F {
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         Pt1Filter::<T, F>::gain_from_frequency(cutoff_frequency_hz * F::FILTER_PT3_CUTOFF_CORRECTION, delta_t)
-    }
-
-    // for testing
-    #[allow(dead_code)]
-    fn state(self) -> [T; 3] {
-        self.state
     }
 }
 
@@ -365,32 +384,19 @@ where
 impl<T, F> BiquadFilter<T, F>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
-    F: Copy
-        + Zero
-        + One
-        + MathConstants
-        + MathMethods
-        + PartialOrd
-        + Mul<F, Output = F>
-        + Div<F, Output = F>
-        + Sub<F, Output = F>,
+    F: Copy + Zero + One + Div<F, Output = F>,
 {
-    pub fn set_to_passthrough(&mut self) {
-        self.b0 = F::one();
-        self.b1 = F::zero();
-        self.b2 = F::zero();
-        self.a1 = F::zero();
-        self.a2 = F::zero();
-        self.weight = F::one();
-        self.reset();
+    pub fn set_q(&mut self, q: F) {
+        self.q = q;
+        self.one_over_2q = F::one() / ((F::one() + F::one()) * q); // cache value for faster setting of frequencies
     }
+}
 
-    pub fn filter_weighted(&mut self, input: T) -> T {
-        let output = self.apply(input);
-        // weight of 1.0 gives just output, weight of 0.0 gives just input
-        (output - input) * self.weight + input
-    }
-
+impl<T, F> BiquadFilter<T, F>
+where
+    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
+    F: Copy + Zero + One,
+{
     pub fn set_weight(&mut self, weight: F) {
         self.weight = weight;
     }
@@ -422,6 +428,45 @@ where
         self.b2 = other.b2;
     }
 
+    pub fn calculate_omega(&self, frequency: F) -> F {
+        frequency * self.two_pi_loop_time_seconds
+    }
+
+    pub fn q(&self) -> F {
+        self.q
+    }
+
+    pub fn loop_time_seconds(&self) -> F {
+        self.loop_time_seconds
+    }
+
+    // for testing
+    #[allow(dead_code)]
+    fn state(self) -> BiquadFilterState<T> {
+        self.state
+    }
+}
+
+impl<T, F> BiquadFilter<T, F>
+where
+    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
+    F: Copy + Zero + One + MathConstants + MathMethods + Div<F, Output = F> + Sub<F, Output = F>,
+{
+    pub fn set_to_passthrough(&mut self) {
+        self.b0 = F::one();
+        self.b1 = F::zero();
+        self.b2 = F::zero();
+        self.a1 = F::zero();
+        self.a2 = F::zero();
+        self.weight = F::one();
+        self.reset();
+    }
+
+    pub fn apply_weighted(&mut self, input: T) -> T {
+        let output = self.apply(input);
+        // weight of 1.0 gives just output, weight of 0.0 gives just input
+        (output - input) * self.weight + input
+    }
     pub fn init_low_pass(&mut self, frequency_hz: F, loop_time_seconds: F, q: F) {
         //assert(Q != 0.0 && "Q cannot be zero");
         self.set_loop_time(loop_time_seconds);
@@ -437,11 +482,6 @@ where
         self.set_notch_frequency_assuming_q(frequency_hz);
         self.reset();
     }
-
-    pub fn calculate_omega(&self, frequency: F) -> F {
-        frequency * self.two_pi_loop_time_seconds
-    }
-
     //Note: weight must be in range [0, 1].
     pub fn set_low_pass_frequency_weighted_assuming_q(&mut self, frequency_hz: F, weight: F) {
         self.weight = weight;
@@ -499,29 +539,16 @@ where
     pub fn set_q_from_frequencies(&mut self, center_frequency_hz: F, lower_cutoff_frequency_hz: F) {
         self.set_q(Self::calculate_q(center_frequency_hz, lower_cutoff_frequency_hz));
     }
+}
 
-    pub fn set_q(&mut self, q: F) {
-        self.q = q;
-        self.one_over_2q = F::one() / ((F::one() + F::one()) * q); // cache value for faster setting of frequencies
-    }
-
-    pub fn q(&self) -> F {
-        self.q
-    }
-
+impl<T, F> BiquadFilter<T, F>
+where
+    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<F, Output = T>,
+    F: Copy + Zero + One + MathConstants,
+{
     pub fn set_loop_time(&mut self, loop_time_seconds: F) {
         self.loop_time_seconds = loop_time_seconds;
         self.two_pi_loop_time_seconds = (F::one() + F::one()) * F::PI * loop_time_seconds; // cache value for faster setting of frequencies
-    }
-
-    pub fn loop_time_seconds(&self) -> F {
-        self.loop_time_seconds
-    }
-
-    // for testing
-    #[allow(dead_code)]
-    fn state(self) -> BiquadFilterState<T> {
-        self.state
     }
 }
 
@@ -722,8 +749,8 @@ mod tests {
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.apply(1.0));
         assert_eq!(2.0, filter.apply(2.0));
-        assert_eq!(1.0, filter.filter_weighted(1.0));
-        assert_eq!(2.0, filter.filter_weighted(2.0));
+        assert_eq!(1.0, filter.apply_weighted(1.0));
+        assert_eq!(2.0, filter.apply_weighted(2.0));
     }
     #[test]
     fn moving_average_filter_f32() {
@@ -800,8 +827,8 @@ mod tests {
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.apply(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
         assert_eq!(2.0, filter.apply(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
-        assert_eq!(1.0, filter.filter_weighted(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
-        assert_eq!(2.0, filter.filter_weighted(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
+        assert_eq!(1.0, filter.apply_weighted(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
+        assert_eq!(2.0, filter.apply_weighted(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
     }
     #[test]
     fn moving_average_filter_vector3df32() {
