@@ -9,6 +9,8 @@
         "debuginfo",
         "Filterf",
         "libm",
+        "Limiterf",
+        "pico",
         "Uninit"
     ]
 }
