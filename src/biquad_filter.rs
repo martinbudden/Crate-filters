@@ -1,11 +1,17 @@
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use num_traits::{One, Zero};
-use vector_quaternion_matrix::{MathConstants, TrigonometricMethods};
+use vector_quaternion_matrix::{MathConstants, TrigonometricMethods, Vector2d, Vector3d};
 
 use crate::SignalFilter;
 
-pub type BiquadFilterf32<T> = BiquadFilter<T, f32>;
-pub type BiquadFilterf64<T> = BiquadFilter<T, f64>;
+pub type BiquadFilterf32 = BiquadFilter<f32, f32>;
+pub type BiquadFilterVector2df32 = BiquadFilter<Vector2d<f32>, f32>;
+pub type BiquadFilterVector2df64 = BiquadFilter<Vector2d<f64>, f64>;
+
+pub type BiquadFilterf64 = BiquadFilter<f64, f64>;
+pub type BiquadFilterVector3df32 = BiquadFilter<Vector3d<f32>, f32>;
+pub type BiquadFilterVector3df64 = BiquadFilter<Vector3d<f64>, f64>;
+
 
 /// Second-order biquad IIR filter.<br>
 /// This implementation uses the Direct Form I structure.
@@ -322,12 +328,12 @@ mod tests {
     #[test]
     fn normal_types() {
         is_full::<BiquadFilter<f32, f32>>();
-        is_full::<BiquadFilterf32<f32>>();
+        is_full::<BiquadFilterf32>();
         is_full::<BiquadFilterState<f32>>();
     }
     #[test]
     fn biquad_filter_f32() {
-        let mut filter = BiquadFilterf32::<f32>::default();
+        let mut filter = BiquadFilterf32::default();
 
         // test that filter with default settings performs no filtering
         assert_eq!(1.0, filter.update(1.0));
@@ -346,7 +352,7 @@ mod tests {
     }
     #[test]
     fn biquad_filter_vector3df32() {
-        let mut filter = BiquadFilterf32::<Vector3df32>::default();
+        let mut filter = BiquadFilterVector3df32::default();
         let mut output: Vector3df32;
         let mut state: BiquadFilterState<Vector3df32>;
 
