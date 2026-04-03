@@ -27,7 +27,7 @@ rustdoc-args = ["--html-in-header", "katex-header.html"]
 
 [dependencies]
 num-traits = "0.2.19"
-vector-quaternion-matrix = { git = "https://github.com/martinbudden/crate-vector_quaternion_matrix" }
+vector-quaternion-matrix = { git = "https://github.com/martinbudden/crate-vector-quaternion-matrix" }
 
 [dev-dependencies]
 # assert_float_eq = "1.2.0" # used for test
