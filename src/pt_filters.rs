@@ -376,7 +376,6 @@ mod tests {
     use super::*;
     use vector_quaternion_matrix::Vector3df32;
     use vector_quaternion_matrix::Vector3di16;
-    use vector_quaternion_matrix::Vector3di32;
 
     fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}

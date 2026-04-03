@@ -68,7 +68,6 @@ mod tests {
     use super::*;
     use vector_quaternion_matrix::Vector3df32;
     use vector_quaternion_matrix::Vector3di16;
-    use vector_quaternion_matrix::Vector3di32;
 
     fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
@@ -126,35 +125,5 @@ mod tests {
 
         m = filter.update(Vector3df32 { x: -9.0, y: 0.0, z: -3.0 });
         assert_eq!(Vector3df32 { x: 5.0, y: 2.0 / 3.0, z: -3.0 }, m);
-    }
-    #[test]
-    fn moving_average_filter_vector3df32_i16() {
-        /*let mut filter = MovingAverageFilter::<Vector3di16, 4>::new();
-        let mut m = filter.update(Vector3di16 { x: 4, y: 0, z: -12 });
-        assert_eq!(Vector3di16 { x: 4, y: 0, z: -12 }, m);
-
-        m = filter.update(Vector3di16 { x: 8, y: 0, z: -12 });
-        assert_eq!(Vector3di16 { x: 6, y: 0, z: -12 }, m);
-
-        m = filter.update(Vector3di16 { x: 12, y: 12, z: 0 });
-        assert_eq!(Vector3di16 { x: 8, y: 4, z: -8 }, m);
-
-        m = filter.update(Vector3di16 { x: 16, y: 8, z: -12 });
-        assert_eq!(Vector3di16 { x: 10, y: 5, z: -9 }, m);*/
-    }
-    #[test]
-    fn moving_average_filter_vector3df32_i32() {
-        /*let mut filter = MovingAverageFilter::<Vector3di32, 4>::new();
-        let mut m = filter.update(Vector3di32 { x: 4, y: 0, z: -12 });
-        assert_eq!(Vector3di32 { x: 4, y: 0, z: -12 }, m);
-
-        m = filter.update(Vector3di32 { x: 8, y: 0, z: -12 });
-        assert_eq!(Vector3di32 { x: 6, y: 0, z: -12 }, m);
-
-        m = filter.update(Vector3di32 { x: 12, y: 12, z: 0 });
-        assert_eq!(Vector3di32 { x: 8, y: 4, z: -8 }, m);
-
-        m = filter.update(Vector3di32 { x: 16, y: 8, z: -12 });
-        assert_eq!(Vector3di32 { x: 10, y: 5, z: -9 }, m);*/
     }
 }
