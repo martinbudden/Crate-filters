@@ -1,12 +1,8 @@
-//#![feature(portable_simd)]
-//use core::simd::f32x4; // A vector of four 32-bit floats#![doc = include_str!("../README.md")]
-//#![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/README.md"))]
-
+#![doc = include_str!("../README.md")]
 // Conventions for generics used in this crate:
 //    T: general type, eg f32, Vector3d, Vector3df32, Quaternion etc
 //    R: real number type ie f32 or f64
 //    F: filter type, eg Pt1Filter, BiquadFilter etc
-
 //#![doc(html_math_jax_enabled)]
 #![no_std]
 #![deny(clippy::unwrap_used)]

@@ -7,26 +7,25 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [features]
-default = ["rp2350", "align", "libm", "simd",]
-std = []
-align = []
-rp2040 = []
-rp2350 = []
-simd = []
-libm = []
+default = []
 
-[target.thumbv8m.main-none-eabihf]
+# used by RP2040
+[target.thumbv6m-none-eabi]
+rustflags = [
+    "-C", "target-cpu=cortex-m0plus",
+]
+
+# used by RP2350
+[target.thumbv8m.main-none-eabihf] # hf = Hard Float
 rustflags = [
     "-C", "target-cpu=cortex-m33",
-    "-C", "target-feature=+fp-armv8d16sp", # This enables the specific floating-point features for the M33
-    "-C", "target-feature=+vfp4sp", # Enables single-precision FPU
 ]
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--html-in-header", "katex-header.html"]
 
 [dependencies]
-num-traits = "0.2.19"
+num-traits = { version = "0.2.19", default-features = false, features = ["libm"] }
 vector-quaternion-matrix = { git = "https://github.com/martinbudden/crate-vector-quaternion-matrix" }
 
 [dev-dependencies]
