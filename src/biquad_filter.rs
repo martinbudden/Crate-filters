@@ -315,13 +315,13 @@ where
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
-    #![allow(unused)]
     #![allow(clippy::float_cmp)]
+    #[allow(unused)]
     use super::*;
-    use vector_quaternion_matrix::Vector3df32;
-    use vector_quaternion_matrix::Vector3di16;
 
-    fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
 
     #[test]
@@ -351,12 +351,12 @@ mod tests {
     }
     #[test]
     fn biquad_filter_vector3df32() {
+        use vector_quaternion_matrix::Vector3df32;
         let mut filter = BiquadFilterVector3df32::default();
-        let mut output: Vector3df32;
         let mut state: BiquadFilterState<Vector3df32>;
 
         // test that filter with default settings performs no filtering
-        output = filter.update(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 });
+        let output = filter.update(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 });
         assert_eq!(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 }, output);
         state = filter.state();
         assert_eq!(2.0, state.x1.x);

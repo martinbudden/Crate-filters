@@ -2,10 +2,17 @@
 
 use core::ops::{Add, Mul, Sub};
 use num_traits::Zero;
-use vector_quaternion_matrix::Vector2df32;
+use vector_quaternion_matrix::{Vector2d, Vector3d, Vector4d};
 
 pub type MovingAverageFilterf32<const N: usize> = MovingAverageFilter<f32, N>;
-pub type MovingAverageFilterVector3df32<const N: usize> = MovingAverageFilter<Vector2df32, N>;
+pub type MovingAverageFilterVector2df32<const N: usize> = MovingAverageFilter<Vector2d<f32>, N>;
+pub type MovingAverageFilterVector3df32<const N: usize> = MovingAverageFilter<Vector3d<f32>, N>;
+pub type MovingAverageFilterVector4df32<const N: usize> = MovingAverageFilter<Vector4d<f32>, N>;
+
+pub type MovingAverageFilterf64<const N: usize> = MovingAverageFilter<f64, N>;
+pub type MovingAverageFilterVector2df64<const N: usize> = MovingAverageFilter<Vector2d<f64>, N>;
+pub type MovingAverageFilterVector3df64<const N: usize> = MovingAverageFilter<Vector3d<f64>, N>;
+pub type MovingAverageFilterVector4df64<const N: usize> = MovingAverageFilter<Vector4d<f64>, N>;
 
 /// Simple moving average filter.<br>
 /// See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
@@ -66,13 +73,13 @@ where
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
-    #![allow(unused)]
     #![allow(clippy::float_cmp)]
+    #[allow(unused)]
     use super::*;
-    use vector_quaternion_matrix::Vector3df32;
-    use vector_quaternion_matrix::Vector3di16;
 
-    fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
 
     #[test]
@@ -97,6 +104,7 @@ mod tests {
     }
     #[test]
     fn moving_average_filter_vector3df32() {
+        use vector_quaternion_matrix::Vector3df32;
         let mut filter = MovingAverageFilter::<Vector3df32, 4>::new();
         let mut m = filter.update(Vector3df32 { x: 1.0, y: 0.0, z: -3.0 });
         assert_eq!(Vector3df32 { x: 1.0, y: 0.0, z: -3.0 }, m);

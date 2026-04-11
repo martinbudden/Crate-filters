@@ -124,11 +124,13 @@ where
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
-    #![allow(unused)]
     #![allow(unused_results)]
+    #[allow(unused)]
     use super::*;
 
+    #[allow(unused)]
     fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
 
     #[test]

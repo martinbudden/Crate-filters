@@ -370,16 +370,15 @@ where
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
-    #![allow(unused)]
     #![allow(clippy::float_cmp)]
     #![allow(unused_results)]
-    use crate::UpdateFilter;
 
+    #[allow(unused)]
     use super::*;
-    use vector_quaternion_matrix::Vector3df32;
-    use vector_quaternion_matrix::Vector3di16;
 
-    fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
 
     #[test]
@@ -433,6 +432,8 @@ mod tests {
     }
     #[test]
     fn pt1_filter_f32_method_call() {
+        use crate::UpdateFilter;
+
         let mut filter = Pt1Filterf32::new(0.2);
         assert_eq!(0.2, filter.update(1.0));
         assert_eq!(0.2, filter.update(0.2));
@@ -446,6 +447,9 @@ mod tests {
     }
     #[test]
     fn pt1_filter_vector3df32_method_call() {
+        use crate::UpdateFilter;
+        use vector_quaternion_matrix::Vector3df32;
+
         let mut filter = Pt1Filterf32::new(0.25);
         assert_eq!(0.05, filter.update(0.2));
         filter.reset();
@@ -494,6 +498,8 @@ mod tests {
     }
     #[test]
     fn pt2_filter_f32_method_call() {
+        use crate::UpdateFilter;
+
         let mut filter = Pt2Filterf32::new(0.2);
         assert_eq!(0.040_000_003, filter.update(1.0));
         assert_eq!(0.0656, filter.update(0.040_000_003));
@@ -547,11 +553,12 @@ mod tests {
     }
     #[test]
     fn pt1_filter_vector3df32() {
+        use vector_quaternion_matrix::Vector3df32;
+
         let mut filter = Pt1Filter::<Vector3df32, f32>::new(1.0);
-        let mut output: Vector3df32;
 
         // test that filter with default settings performs no filtering
-        output = filter.update(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 });
+        let output = filter.update(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 });
         assert_eq!(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 }, output);
         let state = filter.state();
         assert_eq!(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 }, state);
@@ -576,30 +583,42 @@ mod tests {
         assert_eq!(1.0, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
         assert_eq!(2.0, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
     }
-    /*#[test]
-    fn pt1_filter_vector3df32_i16() {
-        let mut filter = Pt1Filter::<Vector3di16, f32>::new(1.0);
-        let mut output: Vector3di16;
-        let mut state: Vector3di16;
+    #[test]
+    fn pt1_filter_vector3di16_i32() {
+        use vector_quaternion_matrix::Vector3di16;
+        let mut filter = Pt1Filter::<Vector3di16, i32>::new(1);
 
         // test that filter with default settings performs no filtering
-        output = filter.update(Vector3di16 { x: 2, y: 3, z: 5 });
+        let output = filter.update(Vector3di16 { x: 2, y: 3, z: 5 });
         assert_eq!(Vector3di16 { x: 2, y: 3, z: 5 }, output);
-        state = filter.state();
+        let state = filter.state();
         assert_eq!(Vector3di16 { x: 2, y: 3, z: 5 }, state);
     }
     #[test]
-    fn pt1_filter_vector3df32_i32() {
-        let mut filter = Pt1Filter::<Vector3di32, f32>::new(1.0);
-        let mut output: Vector3di32;
-        let mut state: Vector3di32;
+    fn pt1_filter_vector3di16_f32() {
+        use vector_quaternion_matrix::Vector3di16;
+        let mut filter = Pt1Filter::<Vector3di16, f32>::new(1.0);
 
         // test that filter with default settings performs no filtering
-        output = filter.update(Vector3di32 { x: 2, y: 3, z: 5 });
+        let output = filter.update(Vector3di16 { x: 2, y: 3, z: 5 });
+        assert_eq!(Vector3di16 { x: 2, y: 3, z: 5 }, output);
+        let state = filter.state();
+        assert_eq!(Vector3di16 { x: 2, y: 3, z: 5 }, state);
+    }
+    /*#[test]
+    fn pt1_filter_vector3df32_i32() {
+        use vector_quaternion_matrix::Vector3d;
+        type Vector3di32 = Vector3d<i32>;
+
+        let mut filter = Pt1Filter::<Vector3di32, f32>::new(1);
+
+        // test that filter with default settings performs no filtering
+        let output = filter.update(Vector3di32{  x: 2, y: 3, z: 5 });
         assert_eq!(2, output.x);
         assert_eq!(3, output.y);
         assert_eq!(5, output.z);
-        state = filter.state();
+
+        let state = filter.state();
         assert_eq!(2, state.x);
         assert_eq!(3, state.y);
         assert_eq!(5, state.z);

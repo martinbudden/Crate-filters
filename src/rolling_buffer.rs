@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use num_traits::Zero;
 
 /// `RollingBuffer<T, const N: usize>`. `N` items of type `T`.<br>
@@ -120,10 +118,12 @@ where
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
-    #![allow(unused)]
+    #[allow(unused)]
     use super::*;
 
+    #[allow(unused)]
     fn is_normal<T: Send + Sized + Sync + Unpin>() {}
+    #[allow(unused)]
     fn is_full<T: Send + Sized + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
 
     #[test]

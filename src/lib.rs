@@ -34,24 +34,22 @@ pub use circular_buffer::CircularBuffer;
 
 pub use filters::{SignalFilter, UpdateFilter};
 
-pub use median_filter::{Median3Filter, Median3Filterf32, MedianFilter, MedianFilterf32};
-pub use median_filter::{Median3FilterVector3df32, MedianFilterVector3df32};
+pub use median_filter::{Median3Filter, Median3Filterf32, Median3Filterf64};
 
-pub use moving_average_filter::MovingAverageFilterVector3df32;
-pub use moving_average_filter::{MovingAverageFilter, MovingAverageFilterf32};
+pub use moving_average_filter::{MovingAverageFilter, MovingAverageFilterf32, MovingAverageFilterf64};
+pub use moving_average_filter::{
+    MovingAverageFilterVector2df32, MovingAverageFilterVector2df64, MovingAverageFilterVector3df32,
+    MovingAverageFilterVector3df64, MovingAverageFilterVector4df32, MovingAverageFilterVector4df64,
+};
 
-pub use pt_filters::{
-    Pt1Filter, Pt1FilterVector2df32, Pt1FilterVector2df64, Pt1FilterVector3df32, Pt1FilterVector3df64, Pt1Filterf32,
-    Pt1Filterf64,
-};
-pub use pt_filters::{
-    Pt2Filter, Pt2FilterVector2df32, Pt2FilterVector2df64, Pt2FilterVector3df32, Pt2FilterVector3df64, Pt2Filterf32,
-    Pt2Filterf64,
-};
-pub use pt_filters::{
-    Pt3Filter, Pt3FilterVector2df32, Pt3FilterVector2df64, Pt3FilterVector3df32, Pt3FilterVector3df64, Pt3Filterf32,
-    Pt3Filterf64,
-};
+pub use pt_filters::{Pt1Filter, Pt1Filterf32, Pt1Filterf64};
+pub use pt_filters::{Pt1FilterVector2df32, Pt1FilterVector2df64, Pt1FilterVector3df32, Pt1FilterVector3df64};
+
+pub use pt_filters::{Pt2Filter, Pt2Filterf32, Pt2Filterf64};
+pub use pt_filters::{Pt2FilterVector2df32, Pt2FilterVector2df64, Pt2FilterVector3df32, Pt2FilterVector3df64};
+
+pub use pt_filters::{Pt3Filter, Pt3Filterf32, Pt3Filterf64};
+pub use pt_filters::{Pt3FilterVector2df32, Pt3FilterVector2df64, Pt3FilterVector3df32, Pt3FilterVector3df64};
 
 pub use rolling_buffer::RollingBuffer;
 

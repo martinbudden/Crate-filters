@@ -1,4 +1,3 @@
-//#![allow(unused)]
 //use core::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 //use core::default::Default;
 use core::ops::{Add, Mul, Neg, Sub};
@@ -92,15 +91,17 @@ where
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
-    #![allow(unused)]
     #![allow(clippy::float_cmp)]
-    use core::default;
+    //use core::default;
 
-    use crate::UpdateFilter;
+    //use crate::UpdateFilter;
 
+    #[allow(unused)]
     use super::*;
 
-    fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + PartialEq>() {}
 
     #[test]
