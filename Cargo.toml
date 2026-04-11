@@ -34,7 +34,7 @@ num-traits = { version = "0.2.19", default-features = false }
 vector-quaternion-matrix = { git = "https://github.com/martinbudden/crate-vector-quaternion-matrix", default-features = false }
 
 [dev-dependencies]
-# assert_float_eq = "1.2.0" # used for test
+criterion = { version = "0.8.2", features = ["html_reports"] }
 
 # see https://doc.rust-lang.org/cargo/reference/profiles.html
 [profile.dev]

@@ -316,6 +316,7 @@ where
 #[cfg(any(debug_assertions, test))]
 mod tests {
     #![allow(unused)]
+    #![allow(clippy::float_cmp)]
     use super::*;
     use vector_quaternion_matrix::Vector3df32;
     use vector_quaternion_matrix::Vector3di16;

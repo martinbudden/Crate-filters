@@ -125,6 +125,7 @@ where
 #[cfg(any(debug_assertions, test))]
 mod tests {
     #![allow(unused)]
+    #![allow(unused_results)]
     use super::*;
 
     fn is_normal<T: Sized + Send + Sync + Unpin>() {}
@@ -137,8 +138,8 @@ mod tests {
     #[test]
     fn new() {
         let cb = CircularBuffer::<f32, 3>::new();
-        assert_eq!(true, cb.is_empty());
-        assert_eq!(false, cb.is_full());
+        assert!(cb.is_empty());
+        assert!(!cb.is_full());
         assert_eq!(2, cb.capacity());
         assert_eq!(0, cb.size());
         assert_eq!(0, cb.begin());
@@ -149,7 +150,7 @@ mod tests {
     #[test]
     fn circular_buffer_size() {
         let mut cb = CircularBuffer::<i32, 5>::new();
-        assert_eq!(true, cb.is_empty());
+        assert!(cb.is_empty());
         assert_eq!(4, cb.capacity());
         assert_eq!(None, cb.pop_front());
 
@@ -181,7 +182,7 @@ mod tests {
         let mut success: bool;
 
         success = cb.push_back(10);
-        assert_eq!(true, success);
+        assert!(success);
         assert_eq!(Some(10), cb.front());
         assert_eq!(Some(10), cb.back());
         assert_eq!(Some(10), cb.at(0));
@@ -193,7 +194,7 @@ mod tests {
         assert_eq!(None, cb.at(6));
 
         success = cb.push_back(11);
-        assert_eq!(true, success);
+        assert!(success);
         assert_eq!(Some(10), cb.front());
         assert_eq!(Some(11), cb.back());
         assert_eq!(Some(10), cb.at(0));
@@ -205,7 +206,7 @@ mod tests {
         assert_eq!(None, cb.at(6));
 
         success = cb.push_back(12);
-        assert_eq!(true, success);
+        assert!(success);
         assert_eq!(Some(10), cb.front());
         assert_eq!(Some(12), cb.back());
         assert_eq!(Some(10), cb.at(0));
@@ -217,7 +218,7 @@ mod tests {
         assert_eq!(None, cb.at(6));
 
         success = cb.push_back(13);
-        assert_eq!(true, success);
+        assert!(success);
         assert_eq!(Some(10), cb.front());
         assert_eq!(Some(13), cb.back());
         assert_eq!(Some(10), cb.at(0));
@@ -230,7 +231,7 @@ mod tests {
 
         // now buffer is full, so pushing items will fail
         success = cb.push_back(14);
-        assert_eq!(false, success);
+        assert!(!success);
         assert_eq!(Some(10), cb.front());
         assert_eq!(Some(13), cb.back());
         assert_eq!(Some(10), cb.at(0));

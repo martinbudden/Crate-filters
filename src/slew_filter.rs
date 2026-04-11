@@ -76,24 +76,24 @@ where
     }
 }
 
-/// Adds `value.limit_slew_using(&mut slew_rate_limiter)` method call to SlewRateLimiter.
+/// Adds `value.limit_slew_using(&mut slew_rate_limiter)` method call to `SlewRateLimiter`.
 pub trait LimitSlew<T> {
-    fn limit_slew_using(&mut self, limiter: &mut SlewRateLimiter<T>) -> &mut Self;
+    fn limit_slew_using(&mut self, limiter: &mut SlewRateLimiter<T>);
 }
 
 impl<T> LimitSlew<T> for T
 where
     T: Copy + PartialOrd + Zero + Neg<Output = T> + Add<T, Output = T> + Sub<T, Output = T> + Mul<T, Output = T>,
 {
-    fn limit_slew_using(&mut self, limiter: &mut SlewRateLimiter<T>) -> &mut Self {
+    fn limit_slew_using(&mut self, limiter: &mut SlewRateLimiter<T>) {
         *self = limiter.update(*self);
-        self
     }
 }
 
 #[cfg(any(debug_assertions, test))]
 mod tests {
     #![allow(unused)]
+    #![allow(clippy::float_cmp)]
     use core::default;
 
     use crate::UpdateFilter;
@@ -198,11 +198,10 @@ mod tests {
         use crate::SlewRateLimiterf32;
         const MAX_MOTOR_COUNT: usize = 8;
         type MotorOutputs = [f32; MAX_MOTOR_COUNT];
-
-        let mut motor_outputs = MotorOutputs::default();
-
         const QUAD_MOTOR_COUNT: usize = 4;
         type QuadOutputs = [f32; QUAD_MOTOR_COUNT];
+
+        let mut motor_outputs = MotorOutputs::default();
 
         let quad_outputs = QuadOutputs::default();
 

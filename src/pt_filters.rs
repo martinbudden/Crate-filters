@@ -371,6 +371,8 @@ where
 #[cfg(any(debug_assertions, test))]
 mod tests {
     #![allow(unused)]
+    #![allow(clippy::float_cmp)]
+    #![allow(unused_results)]
     use crate::UpdateFilter;
 
     use super::*;
@@ -408,9 +410,9 @@ mod tests {
 
         filter.reset();
         filter.set_cutoff_frequency(100.0, 0.001);
-        assert_eq!(0.38586956, filter.k());
-        assert_eq!(0.38586956, filter.update(1.0));
-        assert_eq!(1.0087134, filter.update(2.0));
+        assert_eq!(0.385_869_56, filter.k());
+        assert_eq!(0.385_869_56, filter.update(1.0));
+        assert_eq!(1.008_713_4, filter.update(2.0));
 
         filter.set_k(1.0);
         assert_eq!(1.0, filter.update(1.0));
@@ -422,8 +424,8 @@ mod tests {
         assert_eq!(1.25, filter.update(2.0));
 
         filter.set_cutoff_frequency_and_reset(100.0, 0.001);
-        assert_eq!(0.38586956, filter.update(1.0));
-        assert_eq!(1.0087134, filter.update(2.0));
+        assert_eq!(0.385_869_56, filter.update(1.0));
+        assert_eq!(1.008_713_4, filter.update(2.0));
 
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.update(1.0));
@@ -475,16 +477,16 @@ mod tests {
 
         filter.reset();
         filter.set_cutoff_frequency(100.0, 0.001);
-        assert_eq!(0.24403107, filter.update(1.0));
-        assert_eq!(0.73502403, filter.update(2.0));
+        assert_eq!(0.244_031_07, filter.update(1.0));
+        assert_eq!(0.735_024_03, filter.update(2.0));
 
         filter.set_k(1.0);
         assert_eq!(1.0, filter.update(1.0));
         assert_eq!(2.0, filter.update(2.0));
 
         filter.set_cutoff_frequency_and_reset(100.0, 0.001);
-        assert_eq!(0.24403107, filter.update(1.0));
-        assert_eq!(0.73502403, filter.update(2.0));
+        assert_eq!(0.244_031_07, filter.update(1.0));
+        assert_eq!(0.735_024_03, filter.update(2.0));
 
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.update(1.0));
@@ -493,13 +495,13 @@ mod tests {
     #[test]
     fn pt2_filter_f32_method_call() {
         let mut filter = Pt2Filterf32::new(0.2);
-        assert_eq!(0.040000003, filter.update(1.0));
-        assert_eq!(0.0656, filter.update(0.040000003));
+        assert_eq!(0.040_000_003, filter.update(1.0));
+        assert_eq!(0.0656, filter.update(0.040_000_003));
 
         filter.reset();
         let mut value: f32 = 1.0;
         value.update_using(&mut filter);
-        assert_eq!(0.040000003, value);
+        assert_eq!(0.040_000_003, value);
         value.update_using(&mut filter);
         assert_eq!(0.0656, value);
     }
@@ -528,16 +530,16 @@ mod tests {
 
         filter.reset();
         filter.set_cutoff_frequency(100.0, 0.001);
-        assert_eq!(0.16824766, filter.update(1.0));
-        assert_eq!(0.56259197, filter.update(2.0));
+        assert_eq!(0.168_247_66, filter.update(1.0));
+        assert_eq!(0.562_591_97, filter.update(2.0));
 
         filter.set_k(1.0);
         assert_eq!(1.0, filter.update(1.0));
         assert_eq!(2.0, filter.update(2.0));
 
         filter.set_cutoff_frequency_and_reset(100.0, 0.001);
-        assert_eq!(0.16824766, filter.update(1.0));
-        assert_eq!(0.56259197, filter.update(2.0));
+        assert_eq!(0.168_247_66, filter.update(1.0));
+        assert_eq!(0.562_591_97, filter.update(2.0));
 
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.update(1.0));
@@ -559,16 +561,16 @@ mod tests {
         assert_eq!(Vector3df32 { x: 0.0, y: 0.0, z: 0.0 }, state);
 
         filter.set_cutoff_frequency(100.0, 0.001);
-        assert_eq!(0.38586956, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
-        assert_eq!(1.0087134, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
+        assert_eq!(0.385_869_56, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
+        assert_eq!(1.008_713_4, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
 
         filter.set_k(1.0);
         assert_eq!(1.0, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
         assert_eq!(2.0, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
 
         filter.set_cutoff_frequency_and_reset(100.0, 0.001);
-        assert_eq!(0.38586956, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
-        assert_eq!(1.0087134, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
+        assert_eq!(0.385_869_56, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
+        assert_eq!(1.008_713_4, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);
 
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);

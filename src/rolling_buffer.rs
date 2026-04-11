@@ -2,7 +2,7 @@
 
 use num_traits::Zero;
 
-/// `RollingBuffer<T, const N: usize>`. `N` items of type `T``.<br>
+/// `RollingBuffer<T, const N: usize>`. `N` items of type `T`.<br>
 /// Once full, old items fall off the front when new items are pushed on the back.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct RollingBuffer<T, const N: usize> {
@@ -133,8 +133,8 @@ mod tests {
     #[test]
     fn new() {
         let rb = RollingBuffer::<f32, 3>::new();
-        assert_eq!(true, rb.is_empty());
-        assert_eq!(false, rb.is_full());
+        assert!(rb.is_empty());
+        assert!(!rb.is_full());
         assert_eq!(2, rb.capacity());
         assert_eq!(0, rb.size());
         assert_eq!(0, rb.begin());
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn rolling_buffer_size() {
         let mut rb = RollingBuffer::<i32, 5>::new();
-        assert_eq!(true, rb.is_empty());
+        assert!(rb.is_empty());
         assert_eq!(4, rb.capacity());
 
         assert_eq!(0, rb.size());

@@ -2,7 +2,7 @@
 /// This is because update implies the filter has internal state whereas
 /// apply sometimes implies a "pure" mathematical function with no memory.
 ///
-/// filter.update() reads better than filter.filter()
+/// `filter.update()` reads better than `filter.filter()`
 /// and it also avoids confusion with the filter function in the Iterator trait.
 use vector_quaternion_matrix::{Vector2df32, Vector2df64, Vector3df32, Vector3df64};
 
