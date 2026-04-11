@@ -5,6 +5,16 @@ edition = "2024"
 authors = ["Martin Budden"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
+repository = "https://github.com/martinbudden/crate-filters"
+description = "Filters library, including biquad, moving average, low-pass, and notch filters."
+keywords =  ["filter", "biquad", "moving average", "low-pass", "DSP"]
+categories = [
+    "Embedded development",
+    "Mathematics",
+    "No standard library",
+    "Robotics",
+    "Science",
+]
 
 [features]
 default = ["libm"]
@@ -35,6 +45,7 @@ vector-quaternion-matrix = { git = "https://github.com/martinbudden/crate-vector
 
 [dev-dependencies]
 criterion = { version = "0.8.2", features = ["html_reports"] }
+rand = "0.10.1" 
 
 # see https://doc.rust-lang.org/cargo/reference/profiles.html
 [profile.dev]
@@ -49,6 +60,13 @@ panic = 'unwind'
 incremental = true
 codegen-units = 256
 rpath = false
+
+[profile.dev.package."*"]
+debug = false
+
+[profile.debugging]
+inherits = "dev"
+debug = true
 
 [profile.release]
 opt-level = 3
@@ -66,3 +84,7 @@ rpath = false
 [profile.release-lto]
 inherits = "release"
 lto = true
+
+[[bench]]
+name = "filter_bench"
+harness = false
