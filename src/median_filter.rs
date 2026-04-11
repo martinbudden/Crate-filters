@@ -1,7 +1,5 @@
-use num_traits::Zero;
-
-pub type Median3Filterf32 = Median3Filter<f32>;
-pub type Median3Filterf64 = Median3Filter<f64>;
+pub type MedianFilter3f32 = MedianFilter3<f32>;
+pub type MedianFilter3f64 = MedianFilter3<f64>;
 
 /// Non-linear median-of-3 filter for spike rejection.<br>
 /// Maintains a window of the last three samples and returns the median value.
@@ -16,49 +14,53 @@ pub type Median3Filterf64 = Median3Filter<f64>;
 /// **Note:** This filter introduces a fixed lag of 1 sample. During the
 /// first two samples after a reset, the filter returns the raw input.
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Median3Filter<T> {
+pub struct MedianFilter3<T> {
     buffer: [T; 3],
     index: usize,
     count: usize,
 }
 
-impl<T> Default for Median3Filter<T>
+impl<T> Default for MedianFilter3<T>
 where
-    T: Copy + Zero,
+    T: Copy + Default,
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> Median3Filter<T>
+impl<T> MedianFilter3<T>
 where
-    T: Copy + Zero,
+    T: Copy + Default,
 {
     pub fn new() -> Self {
-        Self { buffer: [T::zero(); 3], index: 0, count: 0 }
+        const COUNT:usize = 3;
+        Self { buffer: [T::default(); COUNT], index: 0, count: 0 }
     }
 }
-impl<T> Median3Filter<T>
+
+impl<T> MedianFilter3<T>
 where
-    T: Copy + Zero + PartialOrd,
+    T: Copy + Default + PartialOrd,
 {
     pub fn reset(&mut self) {
-        self.buffer = [T::zero(); 3];
+        const COUNT:usize = 3;
+        self.buffer = [T::default(); COUNT];
         self.index = 0;
         self.count = 0;
     }
 
     pub fn update(&mut self, input: T) -> T {
+        const COUNT:usize = 3;
         // Store new sample in the ring buffer
         self.buffer[self.index] = input;
-        self.index = (self.index + 1) % 3;
-        if self.count < 3 {
+        self.index = (self.index + 1) % COUNT;
+        if self.count < COUNT {
             self.count += 1;
         }
 
         // If buffer isn't full, just return the input
-        if self.count < 3 {
+        if self.count < COUNT {
             return input;
         }
 
@@ -87,20 +89,20 @@ mod tests {
     #![allow(clippy::float_cmp)]
     #![allow(unused_results)]
     use super::*;
-    //use filters::
 
-    fn _is_normal<T: Sized + Send + Sync + Unpin>() {}
+    #[allow(unused)]
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
     fn is_full<T: Sized + Send + Sync + Unpin + Copy + Clone + Default + PartialEq>() {}
 
     #[test]
     fn normal_types() {
-        is_full::<Median3Filter<f32>>();
+        is_full::<MedianFilter3<f32>>();
     }
     #[test]
     fn median3_spike_rejection() {
         //let mut filter = MovingAverageFilter::<f32, 3>::new();
-        //let mut filter: Median3Filterf32; // as SignalFilter<f32, f32>>;
-        let mut filter = Median3Filterf32::new();
+        //let mut filter: MedianFilter3f32; // as SignalFilter<f32, f32>>;
+        let mut filter = MedianFilter3f32::new();
 
         // 1. Initial values (filling the buffer)
         // Values: [10.0, 0.0, 0.0], count = 1: returns 10.0
@@ -135,7 +137,7 @@ mod tests {
 
     #[test]
     fn median3_identical_values() {
-        let mut filter = Median3Filterf32::new();
+        let mut filter = MedianFilter3f32::new();
         filter.update(5.0);
         filter.update(5.0);
         let output = filter.update(5.0);
@@ -146,7 +148,7 @@ mod tests {
 
     #[test]
     fn median3_reset() {
-        let mut filter = Median3Filterf32::new();
+        let mut filter = MedianFilter3f32::new();
         filter.update(100.0);
         filter.update(100.0);
         filter.update(100.0);

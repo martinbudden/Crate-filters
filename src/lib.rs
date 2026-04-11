@@ -20,6 +20,7 @@ mod biquad_filter;
 mod circular_buffer;
 mod filters;
 mod median_filter;
+mod median_filter5;
 mod moving_average_filter;
 mod pt_filters;
 mod rolling_buffer;
@@ -34,7 +35,8 @@ pub use circular_buffer::CircularBuffer;
 
 pub use filters::{SignalFilter, UpdateFilter};
 
-pub use median_filter::{Median3Filter, Median3Filterf32, Median3Filterf64};
+pub use median_filter::{MedianFilter3, MedianFilter3f32, MedianFilter3f64};
+pub use median_filter5::{MedianFilter5, MedianFilter5f32, MedianFilter5f64};
 
 pub use moving_average_filter::{MovingAverageFilter, MovingAverageFilterf32, MovingAverageFilterf64};
 pub use moving_average_filter::{
