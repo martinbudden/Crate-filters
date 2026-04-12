@@ -6,6 +6,7 @@
 /// and it also avoids confusion with the filter function in the Iterator trait.
 use vqm::{Vector2df32, Vector2df64, Vector3df32, Vector3df64};
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Filter Definition trait.
 /// `filter.reset()`
 /// `filter.update(value)`
@@ -36,7 +37,7 @@ pub trait SignalFilter<T, F> {
 // * If `T` is `Vector3df32`, `R` is `f32`
 // * If `T` is `Vector3df64`, `R` is `f64`
 
-/// Adds `value.update_using(&mut filter)` method call syntax to `SignalFilter`
+/// Adds `value.update_using(&mut filter)` method call syntax to `SignalFilter`.
 /// ```
 /// use signal_filters::{Pt2Filterf32,UpdateFilter};
 /// let mut filter = Pt2Filterf32::new(0.25);

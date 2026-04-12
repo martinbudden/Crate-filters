@@ -12,6 +12,7 @@ pub type BiquadFilterf64 = BiquadFilter<f64, f64>;
 pub type BiquadFilterVector3df32 = BiquadFilter<Vector3d<f32>, f32>;
 pub type BiquadFilterVector3df64 = BiquadFilter<Vector3d<f64>, f64>;
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Second-order biquad IIR filter.<br>
 /// This implementation uses the Direct Form I structure.
 ///
@@ -165,7 +166,7 @@ where
         self.set_parameters_and_weight(a1, a2, b0, b1, b2, R::one());
     }
 
-    /// Copy parameters from another Biquad filter
+    /// Copy parameters from another Biquad filter.
     pub fn set_parameters_from(&mut self, other: &BiquadFilter<T, R>) {
         self.weight = other.weight;
         self.a1 = other.a1;

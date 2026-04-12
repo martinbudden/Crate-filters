@@ -28,6 +28,7 @@ pub type Pt3Filterf64 = Pt3Filter<f64, f64>;
 pub type Pt3FilterVector3df32 = Pt3Filter<Vector3d<f32>, f32>;
 pub type Pt3FilterVector3df64 = Pt3Filter<Vector3d<f64>, f64>;
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Discrete-time, first-order low-pass filter (Proportional Time element).<br>
 /// It is implemented as a stateful struct that allows for efficient, in-place smoothing of sensor data or motor setpoints."
 ///
@@ -43,7 +44,7 @@ pub struct Pt1Filter<T, R> {
     k: R,
 }
 
-/// Default is k = 1.0, which is passthrough
+/// Default is k = 1.0, which is passthrough.
 impl<T, R> Default for Pt1Filter<T, R>
 where
     T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<R, Output = T> + AddAssign,
@@ -158,6 +159,7 @@ where
     }
 }
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Discrete-time, second-order low-pass filter (Proportional Time element).<br>
 /// This is equivalent to two cascaded PT1 filters with the same time constant.
 ///
@@ -177,7 +179,7 @@ pub struct Pt2Filter<T, R> {
     k: R,
 }
 
-/// Default is k = 1.0, which is passthrough
+/// Default is k = 1.0, which is passthrough.
 impl<T, R> Default for Pt2Filter<T, R>
 where
     T: Zero + AddAssign,
@@ -263,6 +265,7 @@ where
     }
 }
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Discrete-time, third-order low-pass filter (Proportional Time element).<br>
 /// This is equivalent to three cascaded PT1 filters. It provides a very steep
 /// 60dB/decade roll-off.
@@ -280,7 +283,7 @@ pub struct Pt3Filter<T, R> {
     k: R,
 }
 
-/// Default is k = 1.0, which is passthrough
+/// Default is k = 1.0, which is passthrough.
 impl<T, R> Default for Pt3Filter<T, R>
 where
     T: Zero,

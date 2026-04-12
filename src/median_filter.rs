@@ -3,6 +3,7 @@ pub type MedianFilter3f64 = MedianFilter3<f64>;
 pub type MedianFilter5f32 = MedianFilter5<f32>;
 pub type MedianFilter5f64 = MedianFilter5<f64>;
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Non-linear median-of-3 filter for spike rejection.<br>
 /// Maintains a window of the last three samples and returns the median value.
 ///

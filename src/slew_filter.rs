@@ -4,6 +4,7 @@ use num_traits::Zero;
 pub type SlewRateLimiterf32 = SlewRateLimiter<f32>;
 pub type SlewRateLimiterf64 = SlewRateLimiter<f64>;
 
+#[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Limits the maximum rate of change ($dV/dt$) of a signal.
 /// It allows for different rates depending on whether the signal is
 /// increasing (rising) or decreasing (falling).
