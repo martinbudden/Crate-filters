@@ -4,7 +4,7 @@
 ///
 /// `filter.update()` reads better than `filter.filter()`
 /// and it also avoids confusion with the filter function in the Iterator trait.
-use vqm::{Vector2df32, Vector2df64, Vector3df32, Vector3df64};
+use vqm::{Vector2df32, Vector2df64, Vector3df32, Vector3df64, Vector4df32, Vector4df64};
 
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Filter Definition trait.
@@ -37,64 +37,73 @@ pub trait SignalFilter<T, F> {
 // * If `T` is `Vector3df32`, `R` is `f32`
 // * If `T` is `Vector3df64`, `R` is `f64`
 
-/// Adds `value.update_using(&mut filter)` method call syntax to `SignalFilter`.
+/// Adds `value.filter_using(&mut filter)` method call syntax to `SignalFilter`.
 /// ```
 /// use signal_filters::{Pt2Filterf32,UpdateFilter};
 /// let mut filter = Pt2Filterf32::new(0.25);
-/// let mut value: f32 = 1.0;
+/// let value: f32 = 1.0;
 ///
-/// value.update_using(&mut filter);
+/// let value = value.filter_using(&mut filter);
 ///
 /// assert_eq!(0.0625, value);
 /// ```
 pub trait UpdateFilter<T, R> {
-    fn update_using<F: SignalFilter<T, R>>(&mut self, filter: &mut F) -> &mut Self;
+    fn filter_using<F: SignalFilter<T, R>>(self, filter: &mut F) -> Self;
 }
 
 impl UpdateFilter<f32, f32> for f32 {
-    fn update_using<F: SignalFilter<f32, f32>>(&mut self, filter: &mut F) -> &mut Self {
-        // *self is f32, filter.update takes and returns f32
-        *self = filter.update(*self);
-        self
+    fn filter_using<F: SignalFilter<f32, f32>>(self, filter: &mut F) -> Self {
+        // self is f32, filter.update takes and returns f32
+        filter.update(self)
     }
 }
 
 impl UpdateFilter<f64, f64> for f64 {
-    fn update_using<F: SignalFilter<f64, f64>>(&mut self, filter: &mut F) -> &mut Self {
-        // *self is f64, filter.update takes and returns f64
-        *self = filter.update(*self);
-        self
+    fn filter_using<F: SignalFilter<f64, f64>>(self, filter: &mut F) -> Self {
+        // self is f64, filter.update takes and returns f64
+        filter.update(self)
     }
 }
 
 impl UpdateFilter<Vector2df32, f32> for Vector2df32 {
-    fn update_using<F: SignalFilter<Vector2df32, f32>>(&mut self, filter: &mut F) -> &mut Self {
-        // *self is Vector2df32, filter.update handles the whole vector at once
-        *self = filter.update(*self);
-        self
+    fn filter_using<F: SignalFilter<Vector2df32, f32>>(self, filter: &mut F) -> Self {
+        // self is Vector2df32, filter.update handles the whole vector at once
+        filter.update(self)
     }
 }
 
 impl UpdateFilter<Vector2df64, f64> for Vector2df64 {
-    fn update_using<F: SignalFilter<Vector2df64, f64>>(&mut self, filter: &mut F) -> &mut Self {
-        // *self is Vector2df64, filter.update handles the whole vector at once
-        *self = filter.update(*self);
-        self
+    fn filter_using<F: SignalFilter<Vector2df64, f64>>(self, filter: &mut F) -> Self {
+        // self is Vector2df64, filter.update handles the whole vector at once
+        filter.update(self)
     }
 }
+
 impl UpdateFilter<Vector3df32, f32> for Vector3df32 {
-    fn update_using<F: SignalFilter<Vector3df32, f32>>(&mut self, filter: &mut F) -> &mut Self {
-        // *self is Vector3df32, filter.update handles the whole vector at once
-        *self = filter.update(*self);
-        self
+    fn filter_using<F: SignalFilter<Vector3df32, f32>>(self, filter: &mut F) -> Self {
+        // self is Vector3df32, filter.update handles the whole vector at once
+        filter.update(self)
     }
 }
 
 impl UpdateFilter<Vector3df64, f64> for Vector3df64 {
-    fn update_using<F: SignalFilter<Vector3df64, f64>>(&mut self, filter: &mut F) -> &mut Self {
-        // *self is Vector3df64, filter.update handles the whole vector at once
-        *self = filter.update(*self);
-        self
+    fn filter_using<F: SignalFilter<Vector3df64, f64>>(self, filter: &mut F) -> Self {
+        // self is Vector3df64, filter.update handles the whole vector at once
+        filter.update(self)
+    }
+}
+
+impl UpdateFilter<Vector4df32, f32> for Vector4df32 {
+    fn filter_using<F: SignalFilter<Vector4df32, f32>>(self, filter: &mut F) -> Self {
+        // self is Vector4df32, filter.update handles the whole vector at once
+        filter.update(self)
+    }
+}
+
+impl UpdateFilter<Vector4df64, f64> for Vector4df64 {
+    fn filter_using<F: SignalFilter<Vector4df64, f64>>(self, filter: &mut F) -> Self {
+        // self is Vector4df64, filter.update handles the whole vector at once
+        filter.update(self)
     }
 }
 #[cfg(any(debug_assertions, test))]

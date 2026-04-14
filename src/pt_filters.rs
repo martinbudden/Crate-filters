@@ -1,32 +1,38 @@
 use core::ops::{Add, AddAssign, Div, Mul, Sub};
 use num_traits::{MulAdd, One, Zero};
-use vqm::{MathConstants, Vector2d, Vector3d};
+use vqm::{MathConstants, Vector2d, Vector3d, Vector4d};
 
 use crate::SignalFilter;
 
 pub type Pt1Filterf32 = Pt1Filter<f32, f32>;
 pub type Pt1FilterVector2df32 = Pt1Filter<Vector2d<f32>, f32>;
-pub type Pt1FilterVector2df64 = Pt1Filter<Vector2d<f64>, f64>;
+pub type Pt1FilterVector3df32 = Pt1Filter<Vector3d<f32>, f32>;
+pub type Pt1FilterVector4df32 = Pt1Filter<Vector4d<f32>, f32>;
 
 pub type Pt1Filterf64 = Pt1Filter<f64, f64>;
-pub type Pt1FilterVector3df32 = Pt1Filter<Vector3d<f32>, f32>;
+pub type Pt1FilterVector2df64 = Pt1Filter<Vector2d<f64>, f64>;
 pub type Pt1FilterVector3df64 = Pt1Filter<Vector3d<f64>, f64>;
+pub type Pt1FilterVector4df64 = Pt1Filter<Vector4d<f64>, f64>;
 
 pub type Pt2Filterf32 = Pt2Filter<f32, f32>;
 pub type Pt2FilterVector2df32 = Pt2Filter<Vector2d<f32>, f32>;
-pub type Pt2FilterVector2df64 = Pt2Filter<Vector2d<f64>, f64>;
+pub type Pt2FilterVector3df32 = Pt2Filter<Vector3d<f32>, f32>;
+pub type Pt2FilterVector4df32 = Pt2Filter<Vector4d<f32>, f32>;
 
 pub type Pt2Filterf64 = Pt2Filter<f64, f64>;
-pub type Pt2FilterVector3df32 = Pt2Filter<Vector3d<f32>, f32>;
+pub type Pt2FilterVector2df64 = Pt2Filter<Vector2d<f64>, f64>;
 pub type Pt2FilterVector3df64 = Pt2Filter<Vector3d<f64>, f64>;
+pub type Pt2FilterVector4df64 = Pt2Filter<Vector4d<f64>, f64>;
 
 pub type Pt3Filterf32 = Pt3Filter<f32, f32>;
 pub type Pt3FilterVector2df32 = Pt3Filter<Vector2d<f32>, f32>;
-pub type Pt3FilterVector2df64 = Pt3Filter<Vector2d<f64>, f64>;
+pub type Pt3FilterVector3df32 = Pt3Filter<Vector3d<f32>, f32>;
+pub type Pt3FilterVector4df32 = Pt3Filter<Vector4d<f32>, f32>;
 
 pub type Pt3Filterf64 = Pt3Filter<f64, f64>;
-pub type Pt3FilterVector3df32 = Pt3Filter<Vector3d<f32>, f32>;
+pub type Pt3FilterVector2df64 = Pt3Filter<Vector2d<f64>, f64>;
 pub type Pt3FilterVector3df64 = Pt3Filter<Vector3d<f64>, f64>;
+pub type Pt3FilterVector4df64 = Pt3Filter<Vector4d<f64>, f64>;
 
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Discrete-time, first-order low-pass filter (Proportional Time element).<br>
@@ -442,10 +448,10 @@ mod tests {
         assert_eq!(0.2, filter.update(0.2));
 
         filter.reset();
-        let mut value: f32 = 1.0;
-        value.update_using(&mut filter);
+        let value: f32 = 1.0;
+        let value = value.filter_using(&mut filter);
         assert_eq!(0.2, value);
-        value.update_using(&mut filter);
+        let value = value.filter_using(&mut filter);
         assert_eq!(0.2, value);
     }
     #[test]
@@ -466,8 +472,8 @@ mod tests {
         assert_eq!(Vector3df32 { x: 0.05, y: 0.125, z: 0.375 }, output);
 
         filter.reset();
-        let mut value = Vector3df32 { x: 0.2, y: 0.5, z: 1.5 };
-        value.update_using(&mut filter);
+        let value = Vector3df32 { x: 0.2, y: 0.5, z: 1.5 };
+        let value = value.filter_using(&mut filter);
         assert_eq!(Vector3df32 { x: 0.05, y: 0.125, z: 0.375 }, value);
     }
     #[test]
@@ -508,10 +514,10 @@ mod tests {
         assert_eq!(0.0656, filter.update(0.040_000_003));
 
         filter.reset();
-        let mut value: f32 = 1.0;
-        value.update_using(&mut filter);
+        let value: f32 = 1.0;
+        let value = value.filter_using(&mut filter);
         assert_eq!(0.040_000_003, value);
-        value.update_using(&mut filter);
+        let value = value.filter_using(&mut filter);
         assert_eq!(0.0656, value);
     }
     #[test]

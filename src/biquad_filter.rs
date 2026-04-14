@@ -1,16 +1,18 @@
 use core::ops::{Add, Div, Mul, Neg, Sub};
 use num_traits::{One, Zero};
-use vqm::{MathConstants, TrigonometricMethods, Vector2d, Vector3d};
+use vqm::{MathConstants, TrigonometricMethods, Vector2d, Vector3d, Vector4d};
 
 use crate::SignalFilter;
 
 pub type BiquadFilterf32 = BiquadFilter<f32, f32>;
 pub type BiquadFilterVector2df32 = BiquadFilter<Vector2d<f32>, f32>;
-pub type BiquadFilterVector2df64 = BiquadFilter<Vector2d<f64>, f64>;
+pub type BiquadFilterVector3df32 = BiquadFilter<Vector3d<f32>, f32>;
+pub type BiquadFilterVector4df32 = BiquadFilter<Vector4d<f32>, f32>;
 
 pub type BiquadFilterf64 = BiquadFilter<f64, f64>;
-pub type BiquadFilterVector3df32 = BiquadFilter<Vector3d<f32>, f32>;
+pub type BiquadFilterVector2df64 = BiquadFilter<Vector2d<f64>, f64>;
 pub type BiquadFilterVector3df64 = BiquadFilter<Vector3d<f64>, f64>;
+pub type BiquadFilterVector4df64 = BiquadFilter<Vector4d<f64>, f64>;
 
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Second-order biquad IIR filter.<br>
