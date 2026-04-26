@@ -48,6 +48,7 @@
         "thumbv",
         "tinytemplate",
         "Uninit",
+        "usize",
         "walkdir",
         "wasi",
         "wasip",
