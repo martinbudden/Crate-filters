@@ -11,11 +11,6 @@ use signal_filters::{
 };
 use vqm::Vector3df32;
 
-// see target/criterion/Matrix%20Math/report/index.html for results
-
-// # Replace 'v3d_bench' with the name defined in your Cargo.toml [[bench]] section
-// RUSTFLAGS="-C target-cpu=native" cargo asm --bench vq_bench "mul_add"
-
 #[allow(clippy::too_many_lines)]
 fn bench_filter(c: &mut Criterion) {
     type MovingAverageFilter4f32 = MovingAverageFilterf32<4>;

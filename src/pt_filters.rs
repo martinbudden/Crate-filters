@@ -94,22 +94,6 @@ where
         Self { state: T::zero(), k }
     }
 }
-/*
-use num_traits::MulAdd;
-
-impl<T, R> SignalFilter<T, R> for Pt1Filter<T, R>
-where
-    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<R, Output = T>,
-    R: Copy,
-{
-    fn update(&mut self, input: T) -> T {
-        // Equation: state = (input - state) * k + state
-        // Using mul_add(multiplier, addend)
-        self.state = (input - self.state).mul_add(self.k, self.state);
-        self.state
-    }
-}
- */
 
 impl<T, R> SignalFilter<T, R> for Pt1Filter<T, R>
 where
