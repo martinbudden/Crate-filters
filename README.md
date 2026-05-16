@@ -1,4 +1,4 @@
-# filters Rust Crate ![license](https://img.shields.io/badge/license-MIT-green) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![open source](https://badgen.net/badge/open/source/blue?icon=github)
+# signal-filters Rust Crate ![license](https://img.shields.io/badge/license-MIT-green) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![open source](https://badgen.net/badge/open/source/blue?icon=github)
 
 This crate contains a collection of filters and utilities for digital signal processing.
 
@@ -49,9 +49,11 @@ and similarly for the other filters.
 This crate also has basic circular and rolling buffers:
 `CircularBuffer<T, const N: usize>` and `RollingBuffer<T, const N: usize>`.
 
+A rolling buffer is similar to a circular buffer, except, once full, old items fall off the front when new items are added.
+
 ## Motivation
 
-They have been developed for use in stabilized vehicles (self balancing robots and aircraft)and have been used to:
+These filters have been developed for use in stabilized vehicles (self balancing robots and aircraft)and have been used to:
 
 1. Filter gyro and accelerometer output for use in the Attitude and Heading Reference System (AHRS).
 2. Filter motor encoder values for use in the motor controller.

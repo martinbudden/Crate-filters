@@ -1,5 +1,5 @@
 use core::ops::{Add, Div, Mul, Neg, Sub};
-use num_traits::{One, Zero};
+use num_traits::{ConstOne, ConstZero, One, Zero};
 use vqm::{MathConstants, TrigonometricMethods, Vector2d, Vector3d, Vector4d};
 
 use crate::SignalFilter;
@@ -22,28 +22,35 @@ pub type BiquadFilterVector3df64 = BiquadFilter<Vector3d<f64>, f64>;
 /// `BiquadFilter` for `Vector4df64`<br><br>
 pub type BiquadFilterVector4df64 = BiquadFilter<Vector4d<f64>, f64>;
 
+pub trait ConstHalf {
+    const HALF: Self;
+}
+
+impl ConstHalf for f32 {
+    const HALF: f32 = 0.5;
+}
+
+impl ConstHalf for f64 {
+    const HALF: f64 = 0.5;
+}
+
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
-/// Second-order biquad IIR filter.<br>
+/// Second-order biquad IIR filter.<br><br>
+///
 /// This implementation uses the Direct Form I structure.
 ///
-/// The transfer function in the Z-domain is:
+/// The difference equation is:
 ///
-/// $$H(z) = \frac{b_{0} + b_{1} z^{-1} + b_{2} z^{-2}}{1 + a_{1} z^{-1} + a_{2} z^{-2}}$$
+/// ```math
+/// {n} = b{0} * x{n} + b{1} * x{n-1} + b{2} * x{n-2} - a{1} * y{n-1} - a{2} * y{n-2}
+/// ```
 ///
-/// The resulting difference equation is:
-///
-/// $$y_{n} = b_{0} x_{n} + b_{1} x_{n-1} + b_{2} x_{n-2} - a_{1} y_{n-1} - a_{2} y_{n-2}$$
-///
-/// where $x$ represents the input signal and $y$ represents the filtered output.
+/// where `x` represents the input signal and `y` represents the filtered output.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct BiquadFilter<T, R> {
     state: BiquadFilterState<T>,
+    coeffs: BiquadFilterCoefficients<R>,
     weight: R,
-    a1: R,
-    a2: R,
-    b0: R,
-    b1: R,
-    b2: R,
     loop_time_seconds: R,
     two_pi_loop_time_seconds: R, // cached value of 2.0 * PI * loop_time_seconds
     q: R,
@@ -52,37 +59,70 @@ pub struct BiquadFilter<T, R> {
 
 impl<T, R> Default for BiquadFilter<T, R>
 where
-    T: Default,
-    R: Zero + One + Div<R, Output = R>,
+    T: Copy + ConstZero,
+    R: Copy + ConstZero + ConstOne + ConstHalf,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<T, R> BiquadFilter<T, R>
+where
+    T: Copy + ConstZero,
+    R: Copy + ConstZero + ConstOne + ConstHalf,
+{
+    pub const fn new() -> Self {
+        Self {
+            state: BiquadFilterState::new(),
+            coeffs: BiquadFilterCoefficients::new(),
+            weight: R::ONE,
+            loop_time_seconds: R::ZERO,
+            two_pi_loop_time_seconds: R::ZERO,
+            q: R::ONE,
+            one_over_2q: R::HALF,
+        }
+    }
+    pub fn with_coefficients(coeffs: BiquadFilterCoefficients<R>) -> Self {
+        Self {
+            state: BiquadFilterState::new(),
+            coeffs,
+            weight: R::ONE,
+            loop_time_seconds: R::ZERO,
+            two_pi_loop_time_seconds: R::ZERO,
+            q: R::ONE,
+            one_over_2q: R::HALF,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct BiquadFilterCoefficients<R> {
+    pub a1: R,
+    pub a2: R,
+    pub b0: R,
+    pub b1: R,
+    pub b2: R,
+}
+
+impl<R> BiquadFilterCoefficients<R>
+where
+    R: Copy + ConstZero + ConstOne,
+{
+    pub const fn new() -> Self {
+        Self { a1: R::ZERO, a2: R::ZERO, b0: R::ONE, b1: R::ZERO, b2: R::ZERO }
+    }
+}
+
+impl<T> Default for BiquadFilterCoefficients<T>
+where
+    T: Copy + ConstZero + ConstOne,
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T, R> BiquadFilter<T, R>
-where
-    T: Default,
-    R: Zero + One + Div<R, Output = R>,
-{
-    pub fn new() -> Self {
-        Self {
-            state: BiquadFilterState::default(),
-            weight: R::one(),
-            a1: R::zero(),
-            a2: R::zero(),
-            b0: R::one(),
-            b1: R::zero(),
-            b2: R::zero(),
-            loop_time_seconds: R::zero(),
-            two_pi_loop_time_seconds: R::zero(),
-            q: R::one(),
-            one_over_2q: R::one() / (R::one() + R::one()),
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 struct BiquadFilterState<T> {
     // Input history
     x1: T,
@@ -90,6 +130,24 @@ struct BiquadFilterState<T> {
     // Output
     y1: T,
     y2: T,
+}
+
+impl<T> BiquadFilterState<T>
+where
+    T: Copy + ConstZero,
+{
+    pub const fn new() -> Self {
+        Self { x1: T::ZERO, x2: T::ZERO, y1: T::ZERO, y2: T::ZERO }
+    }
+}
+
+impl<T> Default for BiquadFilterState<T>
+where
+    T: Copy + ConstZero,
+{
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T, R> SignalFilter<T, R> for BiquadFilter<T, R>
@@ -106,9 +164,9 @@ where
 
     fn update(&mut self, input: T) -> T {
         // 9 operations: 5 multiplications, 4 additions
-        let output = input * self.b0 + self.state.x1 * self.b1 + self.state.x2 * self.b2
-            - self.state.y1 * self.a1
-            - self.state.y2 * self.a2;
+        let output = input * self.coeffs.b0 + self.state.x1 * self.coeffs.b1 + self.state.x2 * self.coeffs.b2
+            - self.state.y1 * self.coeffs.a1
+            - self.state.y2 * self.coeffs.a2;
 
         self.state.x2 = self.state.x1;
         self.state.x1 = input;
@@ -128,8 +186,9 @@ where
 {
     pub fn update_notch(&mut self, input: T) -> T {
         // 8 operations: 3 multiplications, 5 additions
-        let output = (input + self.state.x2) * self.b0 + (self.state.x1 + self.state.x1 - self.state.y1) * self.a1
-            - self.state.y2 * self.a2;
+        let output = (input + self.state.x2) * self.coeffs.b0
+            + (self.state.x1 + self.state.x1 - self.state.y1) * self.coeffs.a1
+            - self.state.y2 * self.coeffs.a2;
 
         self.state.x2 = self.state.x1;
         self.state.x1 = input;
@@ -163,27 +222,19 @@ where
         self.weight
     }
 
-    pub fn set_parameters_and_weight(&mut self, a1: R, a2: R, b0: R, b1: R, b2: R, weight: R) {
-        self.weight = weight;
-        self.a1 = a1;
-        self.a2 = a2;
-        self.b0 = b0;
-        self.b1 = b1;
-        self.b2 = b2;
+    pub fn set_coefficients(&mut self, coeffs: BiquadFilterCoefficients<R>) {
+        self.coeffs = coeffs;
     }
 
-    pub fn set_parameters(&mut self, a1: R, a2: R, b0: R, b1: R, b2: R) {
-        self.set_parameters_and_weight(a1, a2, b0, b1, b2, R::one());
+    pub fn set_coefficients_and_weight(&mut self, coeffs: BiquadFilterCoefficients<R>, weight: R) {
+        self.weight = weight;
+        self.coeffs = coeffs;
     }
 
     /// Copy parameters from another Biquad filter.
     pub fn set_parameters_from(&mut self, other: &BiquadFilter<T, R>) {
         self.weight = other.weight;
-        self.a1 = other.a1;
-        self.a2 = other.a2;
-        self.b0 = other.b0;
-        self.b1 = other.b1;
-        self.b2 = other.b2;
+        self.coeffs = other.coeffs;
     }
 
     pub fn calculate_omega(&self, frequency: R) -> R {
@@ -218,11 +269,11 @@ where
         + Sub<R, Output = R>,
 {
     pub fn set_to_passthrough(&mut self) {
-        self.b0 = R::one();
-        self.b1 = R::zero();
-        self.b2 = R::zero();
-        self.a1 = R::zero();
-        self.a2 = R::zero();
+        self.coeffs.b0 = R::one();
+        self.coeffs.b1 = R::zero();
+        self.coeffs.b2 = R::zero();
+        self.coeffs.a1 = R::zero();
+        self.coeffs.a2 = R::zero();
         self.weight = R::one();
         self.reset();
     }
@@ -263,11 +314,11 @@ where
         let alpha = sin_omega * self.one_over_2q;
         let a0_reciprocal = R::one() / (R::one() + alpha);
 
-        self.b1 = (R::one() - cos_omega) * a0_reciprocal;
-        self.b0 = self.b1 * (R::one() / (R::one() + R::one()));
-        self.b2 = self.b0;
-        self.a1 = -(R::one() + R::one()) * cos_omega * a0_reciprocal;
-        self.a2 = (R::one() - alpha) * a0_reciprocal;
+        self.coeffs.b1 = (R::one() - cos_omega) * a0_reciprocal;
+        self.coeffs.b0 = self.coeffs.b1 * (R::one() / (R::one() + R::one()));
+        self.coeffs.b2 = self.coeffs.b0;
+        self.coeffs.a1 = -(R::one() + R::one()) * cos_omega * a0_reciprocal;
+        self.coeffs.a2 = (R::one() - alpha) * a0_reciprocal;
     }
 
     pub fn set_low_pass_frequency_assuming_q(&mut self, frequency_hz: R) {
@@ -280,11 +331,11 @@ where
         let alpha = sin_omega * self.one_over_2q;
         let a0reciprocal = R::one() / (R::one() + alpha);
         // NOTE: b0 == b2 and a1 == b1 for notch filter
-        self.b0 = a0reciprocal;
-        self.b2 = a0reciprocal;
-        self.b1 = R::zero() - (R::one() + R::one()) * cos_omega * a0reciprocal;
-        self.a1 = self.b1;
-        self.a2 = (R::one() - alpha) * a0reciprocal;
+        self.coeffs.b0 = a0reciprocal;
+        self.coeffs.b2 = a0reciprocal;
+        self.coeffs.b1 = R::zero() - (R::one() + R::one()) * cos_omega * a0reciprocal;
+        self.coeffs.a1 = self.coeffs.b1;
+        self.coeffs.a2 = (R::one() - alpha) * a0reciprocal;
     }
 
     pub fn set_notch_frequency_weighted_assuming_q(&mut self, frequency_hz: R, weight: R) {
@@ -353,7 +404,10 @@ mod tests {
         filter.reset();
         assert_eq!(4.0, filter.update(4.0));
 
-        filter.set_parameters_and_weight(2.0, 3.0, 5.0, 7.0, 11.0, 13.0);
+        filter.set_coefficients_and_weight(
+            BiquadFilterCoefficients { a1: 2.0, a2: 3.0, b0: 5.0, b1: 7.0, b2: 11.0 },
+            13.0,
+        );
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.update(1.0));
         assert_eq!(2.0, filter.update(2.0));
@@ -383,7 +437,10 @@ mod tests {
         assert_eq!(0.0, state.y2.x);
         assert_eq!(4.0, filter.update(Vector3df32 { x: 4.0, y: 0.0, z: 0.0 }).x);
 
-        filter.set_parameters_and_weight(2.0, 3.0, 5.0, 7.0, 11.0, 13.0);
+        filter.set_coefficients_and_weight(
+            BiquadFilterCoefficients { a1: 2.0, a2: 3.0, b0: 5.0, b1: 7.0, b2: 11.0 },
+            13.0,
+        );
         filter.set_to_passthrough();
         assert_eq!(1.0, filter.update(Vector3df32 { x: 1.0, y: 0.0, z: 0.0 }).x);
         assert_eq!(2.0, filter.update(Vector3df32 { x: 2.0, y: 0.0, z: 0.0 }).x);

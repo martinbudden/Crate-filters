@@ -1,6 +1,6 @@
-use num_traits::Zero;
+use num_traits::ConstZero;
 
-/// `CircularBuffer<T, const N: usize>`. `N` items of type `T`.<br>
+/// `CircularBuffer<T, const N: usize>`. `N` items of type `T`.<br><br>
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CircularBuffer<T, const N: usize> {
     /// The virtual beginning of the circular buffer.
@@ -15,7 +15,7 @@ pub struct CircularBuffer<T, const N: usize> {
 
 impl<T, const N: usize> Default for CircularBuffer<T, N>
 where
-    T: Copy + Zero,
+    T: Copy + ConstZero,
 {
     fn default() -> Self {
         Self::new()
@@ -24,9 +24,9 @@ where
 
 impl<T, const N: usize> CircularBuffer<T, N>
 where
-    T: Copy + Zero,
+    T: Copy + ConstZero,
 {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         // SAFETY: Creating an uninitialized array is safe since we use MaybeUninit
         // let buffer = unsafe { core::mem::MaybeUninit::uninit().assume_init() };
         Self {
@@ -34,7 +34,7 @@ where
             end: 0,
             size: 0,
             //buffer: unsafe { core::mem::MaybeUninit::uninit().assume_init() }
-            buffer: [T::zero(); N],
+            buffer: [T::ZERO; N],
         }
     }
 }

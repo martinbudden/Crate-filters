@@ -1,7 +1,7 @@
 #![allow(clippy::cast_precision_loss)]
 
 use core::ops::{Add, Mul, Sub};
-use num_traits::Zero;
+use num_traits::{ConstZero, Zero};
 use vqm::{Vector2d, Vector3d, Vector4d};
 
 /// `MovingAverageFilter` for `f32`<br>
@@ -22,8 +22,8 @@ pub type MovingAverageFilterVector3df64<const N: usize> = MovingAverageFilter<Ve
 /// `MovingAverageFilter` for `Vector4df64`<br><br>
 pub type MovingAverageFilterVector4df64<const N: usize> = MovingAverageFilter<Vector4d<f64>, N>;
 
-/// Simple moving average filter.<br>
-/// See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
+/// Simple moving average filter.<br><br>
+// See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MovingAverageFilter<T, const N: usize> {
     count: usize,
@@ -34,7 +34,7 @@ pub struct MovingAverageFilter<T, const N: usize> {
 
 impl<T, const N: usize> Default for MovingAverageFilter<T, N>
 where
-    T: Copy + Zero,
+    T: Copy + ConstZero,
 {
     fn default() -> Self {
         Self::new()
@@ -43,10 +43,10 @@ where
 
 impl<T, const N: usize> MovingAverageFilter<T, N>
 where
-    T: Copy + Zero,
+    T: Copy + ConstZero,
 {
-    pub fn new() -> Self {
-        Self { count: 0, index: 0, sum: T::zero(), samples: [T::zero(); N] }
+    pub const fn new() -> Self {
+        Self { count: 0, index: 0, sum: T::ZERO, samples: [T::ZERO; N] }
     }
 }
 

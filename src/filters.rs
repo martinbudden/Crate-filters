@@ -12,9 +12,9 @@ use vqm::{Vector2df32, Vector2df64, Vector3df32, Vector3df64, Vector4df32, Vecto
 /// `filter.update(value)`
 /// ```
 ///
-/// use signal_filters::{Pt2Filterf32,SignalFilter};
+/// use signal_filters::{Pt2Filterf32, SignalFilter};
 ///
-/// let mut filter = Pt2Filterf32::new(0.25);
+/// let mut filter = Pt2Filterf32::with_k(0.25);
 /// let mut value:f32 = 1.0;
 ///
 /// value = filter.update(value);
@@ -39,8 +39,8 @@ pub trait SignalFilter<T, F> {
 
 /// Adds `value.filter_using(&mut filter)` method call syntax to `SignalFilter`.
 /// ```
-/// use signal_filters::{Pt2Filterf32,UpdateFilter};
-/// let mut filter = Pt2Filterf32::new(0.25);
+/// use signal_filters::{Pt2Filterf32, UpdateFilter};
+/// let mut filter = Pt2Filterf32::with_k(0.25);
 /// let value: f32 = 1.0;
 ///
 /// let value = value.filter_using(&mut filter);

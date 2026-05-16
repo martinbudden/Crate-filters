@@ -1,7 +1,7 @@
-use num_traits::Zero;
+use num_traits::ConstZero;
 
 /// `RollingBuffer<T, const N: usize>`. `N` items of type `T`.<br>
-/// Once full, old items fall off the front when new items are pushed on the back.
+/// Once full, old items fall off the front when new items are pushed on the back.<br><br>
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct RollingBuffer<T, const N: usize> {
     /// The virtual beginning of the rolling buffer.
@@ -17,7 +17,7 @@ pub struct RollingBuffer<T, const N: usize> {
 
 impl<T, const N: usize> Default for RollingBuffer<T, N>
 where
-    T: Copy + Zero,
+    T: Copy + ConstZero,
 {
     fn default() -> Self {
         Self::new()
@@ -26,9 +26,9 @@ where
 
 impl<T, const N: usize> RollingBuffer<T, N>
 where
-    T: Copy + Zero,
+    T: Copy + ConstZero,
 {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         // SAFETY: Creating an uninitialized array is safe since we use MaybeUninit
         // let buffer = unsafe { core::mem::MaybeUninit::uninit().assume_init() };
         Self {
@@ -36,7 +36,7 @@ where
             end: 0,
             size: 0,
             //buffer: unsafe { core::mem::MaybeUninit::uninit().assume_init() }
-            buffer: [T::zero(); N],
+            buffer: [T::ZERO; N],
         }
     }
 }

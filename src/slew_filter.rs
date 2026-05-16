@@ -1,5 +1,5 @@
 use core::ops::{AddAssign, Mul, Neg, Sub};
-use num_traits::Zero;
+use num_traits::{ConstZero, Zero};
 
 /// `SlewRateLimiter` for `f32`<br>
 pub type SlewRateLimiterf32 = SlewRateLimiter<f32>;
@@ -7,20 +7,12 @@ pub type SlewRateLimiterf32 = SlewRateLimiter<f32>;
 pub type SlewRateLimiterf64 = SlewRateLimiter<f64>;
 
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
-/// Limits the maximum rate of change ($dV/dt$) of a signal.
+/// Limits the maximum rate of change (dV/dt) of a signal.<br>
 /// It allows for different rates depending on whether the signal is
 /// increasing (rising) or decreasing (falling).
 ///
-/// The algorithm calculates the difference $\Delta = x_{n} - y_{n-1}$ and
-/// clamps it based on the elapsed time $\Delta t$:
-///
-/// $$ \Delta_{max} = \begin{cases} R \cdot \Delta t & \text{if } \Delta > 0 \\ F \cdot \Delta t & \text{if } \Delta < 0 \end{cases} $$
-///
-/// $$ y_{n} = y_{n-1} + \text{clamp}(\Delta, -\Delta_{max}, \Delta_{max}) $$
-///
-/// where:
-/// - $R$ is the `rise_rate_per_second`
-/// - $F$ is the `fall_rate_per_second`
+/// The algorithm calculates the difference `delta = x{n} - y{n-1}` and
+/// clamps it based on the elapsed time `delta_t`.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SlewRateLimiter<T> {
     last_output: T,
@@ -30,10 +22,23 @@ pub struct SlewRateLimiter<T> {
 
 impl<T> Default for SlewRateLimiter<T>
 where
-    T: Copy + Zero + Mul<T, Output = T>,
+    T: Copy + ConstZero + Mul<T, Output = T>,
 {
     fn default() -> Self {
-        Self::new(T::zero(), T::zero(), T::zero())
+        Self::new()
+    }
+}
+
+impl<T> SlewRateLimiter<T>
+where
+    T: Copy + ConstZero + Mul<T, Output = T>,
+{
+    pub fn with_rates(rise_rate_per_second: T, fall_rate_per_second: T, dt: T) -> Self {
+        Self { last_output: T::ZERO, rise_step: rise_rate_per_second * dt, fall_step: fall_rate_per_second * dt }
+    }
+
+    pub const fn new() -> Self {
+        Self { last_output: T::ZERO, rise_step: T::ZERO, fall_step: T::ZERO }
     }
 }
 
@@ -41,10 +46,6 @@ impl<T> SlewRateLimiter<T>
 where
     T: Copy + Zero + Mul<T, Output = T>,
 {
-    pub fn new(rise_rate_per_second: T, fall_rate_per_second: T, dt: T) -> Self {
-        Self { last_output: T::zero(), rise_step: rise_rate_per_second * dt, fall_step: fall_rate_per_second * dt }
-    }
-
     pub fn reset(&mut self) {
         self.last_output = T::zero();
     }
@@ -116,7 +117,7 @@ mod tests {
         let dt = 0.1;
         let rise_rate_per_second = 10.0;
         let fall_rate_per_second = 100.0;
-        let mut limiter = SlewRateLimiterf32::new(rise_rate_per_second, fall_rate_per_second, dt);
+        let mut limiter = SlewRateLimiterf32::with_rates(rise_rate_per_second, fall_rate_per_second, dt);
 
         // 1. Test Ramping Up
         // Max rise per step = 10.0 * 0.1 = 1.0 unit
@@ -137,7 +138,7 @@ mod tests {
         let dt = 0.1;
         let rise_rate_per_second = 4.0;
         let fall_rate_per_second = 50.0;
-        let mut limiter = SlewRateLimiterf32::new(rise_rate_per_second, fall_rate_per_second, dt);
+        let mut limiter = SlewRateLimiterf32::with_rates(rise_rate_per_second, fall_rate_per_second, dt);
 
         let input = 100.0;
         let output = limiter.update(input);
@@ -159,7 +160,7 @@ mod tests {
         let dt = 0.1;
         let rise_rate_per_second = 4.0;
         let fall_rate_per_second = 50.0;
-        let mut limiter = SlewRateLimiterf32::new(rise_rate_per_second, fall_rate_per_second, dt);
+        let mut limiter = SlewRateLimiterf32::with_rates(rise_rate_per_second, fall_rate_per_second, dt);
 
         let input = 100.0;
         let output = limiter.update(input);
@@ -179,7 +180,7 @@ mod tests {
         let dt = 0.1;
         let rise_rate_per_second = 4.0;
         let fall_rate_per_second = 50.0;
-        let mut limiter = SlewRateLimiterf32::new(rise_rate_per_second, fall_rate_per_second, dt);
+        let mut limiter = SlewRateLimiterf32::with_rates(rise_rate_per_second, fall_rate_per_second, dt);
 
         let mut value = 100.0;
         value.limit_slew_using(&mut limiter);

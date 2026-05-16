@@ -1,5 +1,5 @@
 use core::ops::{Add, AddAssign, Div, Mul, Sub};
-use num_traits::{MulAdd, One, Zero};
+use num_traits::{ConstOne, ConstZero, MulAdd, One, Zero};
 use vqm::{MathConstants, Vector2d, Vector3d, Vector4d};
 
 use crate::SignalFilter;
@@ -59,15 +59,21 @@ pub type Pt3FilterVector3df64 = Pt3Filter<Vector3d<f64>, f64>;
 pub type Pt3FilterVector4df64 = Pt3Filter<Vector4d<f64>, f64>;
 
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
-/// Discrete-time, first-order low-pass filter (Proportional Time element).<br>
-/// It is implemented as a stateful struct that allows for efficient, in-place smoothing of sensor data or motor setpoints."
+/// Discrete-time, first-order low-pass filter (Proportional Time element).
+///
+/// It is implemented as a stateful struct that allows for efficient, in-place
+/// smoothing of sensor data or motor setpoints.
 ///
 /// The discrete-time transfer function is:
 ///
-/// $$y_{n} = y_{n-1} + k \cdot (x_{n} - y_{n-1})$$
+/// ```math
+/// y{n} = y{n-1} + k * (x{n} - y{n-1})
+/// ```
 ///
-/// where $k$ is calculated from the time constant $T$ and sample time $dt$:
-/// $k = \frac{dt}{T + dt}$
+/// where `k` is calculated from the time constant `T` and sample time `dt`:
+/// ```math
+/// k = dt / (T + dt)
+/// ```
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Pt1Filter<T, R> {
     state: T,
@@ -77,21 +83,24 @@ pub struct Pt1Filter<T, R> {
 /// Default is k = 1.0, which is passthrough.
 impl<T, R> Default for Pt1Filter<T, R>
 where
-    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<R, Output = T> + AddAssign,
-    R: One,
+    T: Copy + ConstZero + Add<Output = T> + Sub<Output = T> + Mul<R, Output = T> + AddAssign,
+    R: ConstOne,
 {
     fn default() -> Self {
-        Self::new(R::one())
+        Self::new()
     }
 }
 
 impl<T, R> Pt1Filter<T, R>
 where
-    T: Copy + Zero + Add<Output = T> + Sub<Output = T> + Mul<R, Output = T> + AddAssign,
-    R: One,
+    T: Copy + ConstZero + Add<Output = T> + Sub<Output = T> + Mul<R, Output = T> + AddAssign,
+    R: ConstOne,
 {
-    pub fn new(k: R) -> Self {
-        Self { state: T::zero(), k }
+    pub const fn with_k(k: R) -> Self {
+        Self { state: T::ZERO, k }
+    }
+    pub const fn new() -> Self {
+        Self::with_k(R::ONE)
     }
 }
 
@@ -179,14 +188,16 @@ where
 ///
 /// The discrete-time difference equations are:
 ///
-/// $$w_{n} = w_{n-1} + k \cdot (x_{n} - w_{n-1})$$
-/// $$y_{n} = y_{n-1} + k \cdot (w_{n} - y_{n-1})$$
+/// ```math
+/// w{n} = w{n-1} + k * (x{n} - w{n-1})
+/// y{n} = y{n-1} + k * (w{n} - y{n-1})
+/// ```
 ///
 /// where:
-/// - $x_{n}$ is the raw input
-/// - $w_{n}$ is the internal state (output of the first stage)
-/// - $y_{n}$ is the final filtered output
-/// - $k$ is the filter gain
+/// - `x{n}` is the raw input
+/// - `w{n}` is the internal state (output of the first stage)
+/// - `y{n}` is the final filtered output
+/// - `k` is the filter gain
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Pt2Filter<T, R> {
     state: [T; 2],
@@ -196,21 +207,24 @@ pub struct Pt2Filter<T, R> {
 /// Default is k = 1.0, which is passthrough.
 impl<T, R> Default for Pt2Filter<T, R>
 where
-    T: Zero + AddAssign,
-    R: One,
+    T: ConstZero,
+    R: ConstOne,
 {
     fn default() -> Self {
-        Self::new(R::one())
+        Self::new()
     }
 }
 
 impl<T, R> Pt2Filter<T, R>
 where
-    T: Zero + AddAssign,
-    R: One,
+    T: ConstZero,
+    R: ConstOne,
 {
-    pub fn new(k: R) -> Self {
-        Self { state: [T::zero(), T::zero()], k }
+    pub const fn with_k(k: R) -> Self {
+        Self { state: [T::ZERO, T::ZERO], k }
+    }
+    pub const fn new() -> Self {
+        Self::with_k(R::ONE)
     }
 }
 
@@ -282,15 +296,17 @@ where
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Discrete-time, third-order low-pass filter (Proportional Time element).<br>
 /// This is equivalent to three cascaded PT1 filters. It provides a very steep
-/// 60dB/decade roll-off.
+/// 60dB/decade roll-off.<br><br>
 ///
 /// The discrete-time difference equations are:
 ///
-/// $$u_{n} = u_{n-1} + k \cdot (x_{n} - u_{n-1})$$
-/// $$v_{n} = v_{n-1} + k \cdot (u_{n} - v_{n-1})$$
-/// $$y_{n} = y_{n-1} + k \cdot (v_{n} - y_{n-1})$$
+/// ```math
+/// u{n} = u{n-1} + k * (x{n} - u{n-1})
+/// v{n} = v{n-1} + k * (u{n} - v{n-1})
+/// y{n} = y{n-1} + k * (v{n} - y{n-1})
+/// ```
 ///
-/// where $u_{n}$ and $v_{n}$ are internal intermediate states, and $y_{n}$ is the final output.
+/// where `u{n}` and `v{n}` are internal intermediate states, and `y{n}` is the final output.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Pt3Filter<T, R> {
     state: [T; 3],
@@ -300,21 +316,24 @@ pub struct Pt3Filter<T, R> {
 /// Default is k = 1.0, which is passthrough.
 impl<T, R> Default for Pt3Filter<T, R>
 where
-    T: Zero,
-    R: One,
+    T: ConstZero,
+    R: ConstOne,
 {
     fn default() -> Self {
-        Self::new(R::one())
+        Self::new()
     }
 }
 
 impl<T, R> Pt3Filter<T, R>
 where
-    T: Zero,
-    R: One,
+    T: ConstZero,
+    R: ConstOne,
 {
-    pub fn new(k: R) -> Self {
-        Self { state: [T::zero(), T::zero(), T::zero()], k }
+    pub const fn with_k(k: R) -> Self {
+        Self { state: [T::ZERO, T::ZERO, T::ZERO], k }
+    }
+    pub const fn new() -> Self {
+        Self::with_k(R::ONE)
     }
 }
 
@@ -409,7 +428,7 @@ mod tests {
     }
     #[test]
     fn pt1_filter_f32() {
-        let mut filter = Pt1Filterf32::new(1.0);
+        let mut filter = Pt1Filterf32::new();
 
         let mut reading: f32 = 2.7;
         reading = filter.update(reading);
@@ -451,7 +470,7 @@ mod tests {
     fn pt1_filter_f32_method_call() {
         use crate::UpdateFilter;
 
-        let mut filter = Pt1Filterf32::new(0.2);
+        let mut filter = Pt1Filterf32::with_k(0.2);
         assert_eq!(0.2, filter.update(1.0));
         assert_eq!(0.2, filter.update(0.2));
 
@@ -467,14 +486,14 @@ mod tests {
         use crate::UpdateFilter;
         use vqm::Vector3df32;
 
-        let mut filter = Pt1Filterf32::new(0.25);
+        let mut filter = Pt1Filterf32::with_k(0.25);
         assert_eq!(0.05, filter.update(0.2));
         filter.reset();
         assert_eq!(0.125, filter.update(0.5));
         filter.reset();
         assert_eq!(0.375, filter.update(1.5));
 
-        let mut filter = Pt1FilterVector3df32::new(0.25);
+        let mut filter = Pt1FilterVector3df32::with_k(0.25);
         let value = Vector3df32 { x: 0.2, y: 0.5, z: 1.5 };
         let output = filter.update(value);
         assert_eq!(Vector3df32 { x: 0.05, y: 0.125, z: 0.375 }, output);
@@ -486,7 +505,7 @@ mod tests {
     }
     #[test]
     fn pt2_filter_f32() {
-        let mut filter = Pt2Filterf32::new(1.0);
+        let mut filter = Pt2Filterf32::with_k(1.0);
 
         // test that filter with default settings performs no filtering
         assert_eq!(1.0, filter.update(1.0));
@@ -517,7 +536,7 @@ mod tests {
     fn pt2_filter_f32_method_call() {
         use crate::UpdateFilter;
 
-        let mut filter = Pt2Filterf32::new(0.2);
+        let mut filter = Pt2Filterf32::with_k(0.2);
         assert_eq!(0.040_000_003, filter.update(1.0));
         assert_eq!(0.0656, filter.update(0.040_000_003));
 
@@ -530,7 +549,7 @@ mod tests {
     }
     #[test]
     fn pt3_filter_f32() {
-        let mut filter = Pt3Filterf32::new(1.0);
+        let mut filter = Pt3Filterf32::with_k(1.0);
 
         let mut state = filter.state();
         assert_eq!([0.0, 0.0, 0.0], state);
@@ -572,7 +591,7 @@ mod tests {
     fn pt1_filter_vector3df32() {
         use vqm::Vector3df32;
 
-        let mut filter = Pt1Filter::<Vector3df32, f32>::new(1.0);
+        let mut filter = Pt1Filter::<Vector3df32, f32>::with_k(1.0);
 
         // test that filter with default settings performs no filtering
         let output = filter.update(Vector3df32 { x: 2.0, y: 3.0, z: 5.0 });
@@ -603,7 +622,7 @@ mod tests {
     #[test]
     fn pt1_filter_vector3di16_i32() {
         use vqm::Vector3di16;
-        let mut filter = Pt1Filter::<Vector3di16, i32>::new(1);
+        let mut filter = Pt1Filter::<Vector3di16, i32>::new();
 
         // test that filter with default settings performs no filtering
         let output = filter.update(Vector3di16 { x: 2, y: 3, z: 5 });
@@ -614,7 +633,7 @@ mod tests {
     #[test]
     fn pt1_filter_vector3di16_f32() {
         use vqm::Vector3di16;
-        let mut filter = Pt1Filter::<Vector3di16, f32>::new(1.0);
+        let mut filter = Pt1Filter::<Vector3di16, f32>::new();
 
         // test that filter with default settings performs no filtering
         let output = filter.update(Vector3di16 { x: 2, y: 3, z: 5 });

@@ -1,3 +1,5 @@
+use num_traits::ConstZero;
+
 /// `Median3Filter` for `f32`<br>
 pub type MedianFilter3f32 = MedianFilter3<f32>;
 /// `Median3Filter` for `f64`<br><br>
@@ -9,14 +11,16 @@ pub type MedianFilter5f64 = MedianFilter5<f64>;
 
 #[allow(clippy::doc_paragraphs_missing_punctuation)]
 /// Non-linear median-of-3 filter for spike rejection.<br>
-/// Maintains a window of the last three samples and returns the median value.
+/// Maintains a window of the last three samples and returns the median value.<br>
 ///
 /// It is effective at removing single-sample outliers without "smearing"
 /// the error into subsequent samples like a linear low-pass filter would.
 ///
-/// The output $y_{n}$ is defined as:
+/// The output `y{n}` is defined as:
 ///
-/// $$y_{n} = \text{median}(x_{n}, x_{n-1}, x_{n-2})$$
+/// ```math
+/// y{n} = {median}(x{n}, x{n-1}, x{n-2})
+/// ```
 ///
 /// **Note:** This filter introduces a fixed lag of 1 sample. During the
 /// first two samples after a reset, the filter returns the raw input.
@@ -29,7 +33,7 @@ pub struct MedianFilter3<T> {
 
 impl<T> Default for MedianFilter3<T>
 where
-    T: Copy + Default,
+    T: Copy + ConstZero,
 {
     fn default() -> Self {
         Self::new()
@@ -38,11 +42,11 @@ where
 
 impl<T> MedianFilter3<T>
 where
-    T: Copy + Default,
+    T: Copy + ConstZero,
 {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         const COUNT: usize = 3;
-        Self { buffer: [T::default(); COUNT], index: 0, count: 0 }
+        Self { buffer: [T::ZERO; COUNT], index: 0, count: 0 }
     }
 }
 
@@ -92,7 +96,7 @@ where
 }
 
 /// Non-linear median-of-5 filter for spike rejection.<br>
-/// Maintains a window of the last three samples and returns the median value.
+/// Maintains a window of the last three samples and returns the median value.<br><br>
 ///
 /// It is effective at removing single-sample outliers without "smearing"
 /// the error into subsequent samples like a linear low-pass filter would.
